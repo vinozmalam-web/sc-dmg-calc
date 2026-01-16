@@ -1,5 +1,5 @@
 import React from 'react';
-import { CalculationResult, DpsStats, StatKey, Language } from '../types';
+import { CalculationResult, DpsStats, StatKey } from '../types';
 import { Activity, Crosshair, Zap, ShieldAlert, Timer } from 'lucide-react';
 import { UI_TEXT } from '../constants';
 

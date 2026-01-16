@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Stats, SavedConfig, StatKey, Language } from './types';
 import { DEFAULT_BASE_STATS, DEFAULT_CHIP_STATS, BASE_STATS_KEYS, CHIP_STATS_KEYS, UI_TEXT, LABELS } from './constants';
 import { DamageCalculator } from './services/calculator';
