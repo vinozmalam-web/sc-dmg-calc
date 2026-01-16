@@ -1,86 +1,104 @@
-import { Stats, CalculationResult, ReplacementResult } from '../types';
-import { CHIP_STATS_KEYS } from '../constants';
+import { Stats, CalculationResult, ReplacementResult, StatKey } from '../types';
 
 export class DamageCalculator {
   
-  static calculate(baseStats: Stats, chips: Stats[]): CalculationResult {
-    // --- Stage 1: Bonus Totals ---
-    // Sum all bonuses from chips
-    const bonuses: Stats = {};
+  // Helper to calculate mod from Z value
+  private static getMod(z: number): number {
+    // Prevent division by zero if z is -100 or close to it
+    if (z <= -99.99) return -1000; 
     
-    // Initialize
-    CHIP_STATS_KEYS.forEach(key => bonuses[key] = 0);
-
-    // Sum
-    chips.forEach(chip => {
-      CHIP_STATS_KEYS.forEach(key => {
-        bonuses[key] += (chip[key] || 0);
-      });
-    });
-
-    // Normalize (divide by 100)
-    const normalizedBonuses: Stats = {};
-    for (const key in bonuses) {
-      normalizedBonuses[key] = bonuses[key] / 100.0;
+    if (z < 0) {
+        return 1.0 - (100.0 / (100.0 + z));
     }
+    return z / 100.0;
+  }
 
-    // --- Stage 2: Intermediate Coefficients (d1 - d3) ---
-    const b_dmg = baseStats.damage || 0;
-
-    // d1 = BaseDmg * (1 + BonusElem + BonusDmg)
-    const d1 = b_dmg * (1.0 + (normalizedBonuses.elem_damage || 0) + (normalizedBonuses.damage || 0));
-
-    // d2 = d1 * (1 + BonusDestroyers)
-    const d2 = d1 * (1.0 + (normalizedBonuses.dmg_destroyers || 0));
-
-    // d3 = d2 * (1 + BonusAliens)
-    const d3 = d2 * (1.0 + (normalizedBonuses.dmg_aliens || 0));
-
-    // --- Stage 3: Final Attributes ---
-    const finalStats: Stats = {};
-    
-    // Standard multiplier logic: Base * (1 + Bonus)
-    const directMultipliers = ["fire_rate", "range", "crit_chance", "crit_power", "overheat"];
-    directMultipliers.forEach(stat => {
-      finalStats[stat] = (baseStats[stat] || 0) * (1.0 + (normalizedBonuses[stat] || 0));
+  // Helper to calculate final value based on base and list of Z values
+  private static calculateFinalValue(base: number, zValues: number[]): { value: number, modSum: number } {
+    let modSum = 0;
+    zValues.forEach(z => {
+        modSum += this.getMod(z);
     });
 
-    // Special Case: Cooldown = Base * (1 - Bonus)
-    finalStats.cooldown = (baseStats.cooldown || 0) * (1.0 - (normalizedBonuses.cooldown || 0));
+    let value = 0;
+    if (modSum < 0) {
+      value = base / (1.0 - modSum);
+    } else {
+      value = base * (1.0 + modSum);
+    }
+    
+    return { value, modSum };
+  }
 
-    // --- Stage 4: Final DPS/DPM ---
-    const f_fr = finalStats.fire_rate;
-    const f_cc = finalStats.crit_chance;
-    const f_cp = finalStats.crit_power;
-    const f_oh = finalStats.overheat;
-    const f_cd = finalStats.cooldown;
+  static calculate(baseStats: Stats, chips: Stats[]): CalculationResult {
+    // Helper to extract non-zero Z values for a specific key from all chips
+    const getZValues = (key: string): number[] => {
+        return chips.map(c => c[key] || 0).filter(v => v !== 0);
+    };
+
+    // --- Stage 1: D1 (Base Damage + Damage/Elem Bonuses) ---
+    // Combine damage and elem_damage raw values
+    const dmgZ = getZValues('damage');
+    const elemZ = getZValues('elem_damage');
+    const d1Z = [...dmgZ, ...elemZ];
+    
+    const d1Result = this.calculateFinalValue(baseStats.damage || 0, d1Z);
+    const d1 = d1Result.value;
+
+    // --- Stage 2: D2 (D1 + Destroyers) ---
+    const d2Z = getZValues('dmg_destroyers');
+    const d2Result = this.calculateFinalValue(d1, d2Z);
+    const d2 = d2Result.value;
+
+    // --- Stage 3: D3 (D2 + Aliens) ---
+    const d3Z = getZValues('dmg_aliens');
+    const d3Result = this.calculateFinalValue(d2, d3Z);
+    const d3 = d3Result.value;
+
+    // --- Stage 4: Final Attributes (Standard Stats) ---
+    const finalStats: Stats = {};
+    const mods: Record<string, number> = {};
+    
+    // Explicitly casting strings to StatKey for type safety in loop
+    const statKeys: StatKey[] = ["fire_rate", "range", "crit_chance", "crit_power", "overheat", "cooldown"];
+    
+    statKeys.forEach(key => {
+        const zVals = getZValues(key);
+        const res = this.calculateFinalValue(baseStats[key] || 0, zVals);
+        finalStats[key] = res.value;
+        mods[key] = res.modSum;
+    });
+
+    // --- Stage 5: Final DPS/DPM Calculations ---
+    const f_fr = finalStats.fire_rate || 0;
+    const f_cc = finalStats.crit_chance || 0;
+    const f_cp = finalStats.crit_power || 0;
+    const f_oh = finalStats.overheat || 0;
+    const f_cd = finalStats.cooldown || 0;
     
     // DPM Denominator
     const dpm_denom = (f_oh + f_cd) !== 0 ? (f_oh + f_cd) : 1.0;
-    const rangeBonus = normalizedBonuses.range || 0;
+    
+    // Range Bonus Mod (used in Clean DPS calculation)
+    const rangeMod = mods['range'] || 0;
 
-    // Helper to calc DPS suite
     const calculateMode = (baseDmg: number) => {
       // Clean DPS = (BaseDmg * FireRate) / 60
-      const clean_dps = ((baseDmg * f_fr) / 60.0) * (1 + rangeBonus / 2);
+      // Applied Range Bonus multiplier logic: * (1 + rangeBonus/2)
+      const clean_dps = ((baseDmg * f_fr) / 60.0) * (1.0 + rangeMod / 2.0);
       
-      // Crit DPS = Clean * (CritChance/100) * (1 + CritPower/100)
-      // Note: Logic assumes f_cc and f_cp are raw values, potentially percentages themselves?
-      // Based on Python script: f_cc/100 and f_cp/100
+      // Crit DPS
       const crit_dps = clean_dps * (f_cc / 100.0) * (1.0 + (f_cp / 100.0));
       
       const total_dps = clean_dps + crit_dps;
       
-      // DPM = 60 / (OH + CD) * TotalDPS * OH
+      // DPM
       const dpm = (60.0 / dpm_denom) * total_dps * f_oh;
 
       return { clean_dps, crit_dps, total_dps, dpm };
     };
 
-    // Spec Ops (Uses d3 - Aliens)
     const spec_ops = calculateMode(d3);
-
-    // General (Uses d1 - Basic/Elem)
     const general = calculateMode(d1);
 
     return {
@@ -99,14 +117,10 @@ export class DamageCalculator {
     const baseline = this.calculate(baseStats, currentChips);
     const results: ReplacementResult[] = [];
 
-    // Check if candidate is empty (optimization)
     const isCandidateEmpty = Object.values(candidateChip).every(v => v === 0);
     if (isCandidateEmpty) return [];
 
     for (let i = 0; i < currentChips.length; i++) {
-        // Skip empty current chips? Logic says try replacing everything.
-        
-        // Create copy with replacement
         const tempChips = [...currentChips];
         tempChips[i] = candidateChip;
 
@@ -127,7 +141,6 @@ export class DamageCalculator {
         });
     }
 
-    // Return all results, let UI sort them
     return results;
   }
 }

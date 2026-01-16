@@ -110,7 +110,7 @@ export const UI_TEXT = {
     configNamePlaceholder: "Название конфига",
     emptyRecs: "Введите характеристики нового чипа для сравнения.",
     gain: "Прирост",
-    loss: "Убыток"
+    loss: "Штраф"
   }
 };
 
