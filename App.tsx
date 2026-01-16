@@ -105,7 +105,7 @@ export default function App() {
   const loadConfig = (config: SavedConfig) => {
     setBaseStats(config.baseStats);
     setChips(config.chips);
-    setCandidate(config.candidate || DEFAULT_CHIP_STATS);
+    // Explicitly NOT loading candidate stats to allow comparison of the same candidate across different configs
     setConfigName(config.name);
     setIsSidebarOpen(false);
   };
