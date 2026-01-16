@@ -11,6 +11,7 @@ interface AnalysisPanelProps {
   candidate: Stats;
   labels: Record<StatKey, string>;
   texts: typeof UI_TEXT['en'];
+  tooltips: Record<StatKey, string>;
   onCandidateChange: (key: string, value: number) => void;
   onApplyReplacement: (index: number) => void;
   onResetCandidate: () => void;
@@ -23,6 +24,7 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   candidate,
   labels,
   texts,
+  tooltips,
   onCandidateChange,
   onApplyReplacement,
   onResetCandidate,
@@ -74,6 +76,7 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
                 statKey={key}
                 value={candidate[key] || 0}
                 label={labels[key]}
+                description={tooltips[key]}
                 onChange={onCandidateChange}
                 compact
               />

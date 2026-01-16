@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Stats, SavedConfig, StatKey, Language } from './types';
-import { DEFAULT_BASE_STATS, DEFAULT_CHIP_STATS, BASE_STATS_KEYS, CHIP_STATS_KEYS, UI_TEXT, LABELS } from './constants';
+import { DEFAULT_BASE_STATS, DEFAULT_CHIP_STATS, BASE_STATS_KEYS, CHIP_STATS_KEYS, UI_TEXT, LABELS, TOOLTIPS } from './constants';
 import { DamageCalculator } from './services/calculator';
 import { StatInput } from './components/StatInput';
 import { ResultsPanel } from './components/ResultsPanel';
@@ -52,6 +52,7 @@ export default function App() {
   // --- Helpers ---
   const text = UI_TEXT[language];
   const labels = LABELS[language];
+  const tooltips = TOOLTIPS[language];
 
   // --- Handlers ---
   const updateBaseStat = (key: StatKey, value: number) => {
@@ -230,6 +231,7 @@ export default function App() {
                         key={key} 
                         statKey={key} 
                         label={labels[key]}
+                        description={tooltips[key]}
                         value={baseStats[key] || 0} 
                         onChange={updateBaseStat} 
                       />
@@ -270,6 +272,7 @@ export default function App() {
                       key={key}
                       statKey={key}
                       label={labels[key]}
+                      description={tooltips[key]}
                       value={chips[activeChipTab][key] || 0}
                       onChange={(k, v) => updateChipStat(activeChipTab, k, v)}
                     />
@@ -297,6 +300,7 @@ export default function App() {
            candidate={candidate}
            labels={labels}
            texts={text}
+           tooltips={tooltips}
            onCandidateChange={updateCandidate}
            onApplyReplacement={applyReplacement}
            onResetCandidate={() => setCandidate(DEFAULT_CHIP_STATS)}
