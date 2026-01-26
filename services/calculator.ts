@@ -1,10 +1,9 @@
-import { Stats, CalculationResult, ReplacementResult, StatKey } from '../types';
+import { Stats, CalculationResult, ReplacementResult, StatKey, ModuleState } from '../types';
 
 export class DamageCalculator {
   
   // Helper to calculate mod from Z value
   private static getMod(z: number): number {
-    // Prevent division by zero if z is -100 or close to it
     if (z <= -99.99) return -1000; 
     
     if (z < 0) {
@@ -30,14 +29,18 @@ export class DamageCalculator {
     return { value, modSum };
   }
 
-  static calculate(baseStats: Stats, chips: Stats[]): CalculationResult {
-    // Helper to extract non-zero Z values for a specific key from all chips
+  static calculate(baseStats: Stats, chips: Stats[], activeModules: Record<string, ModuleState> = {}): CalculationResult {
+    // Helper to extract non-zero Z values for a specific key from all chips AND active modules
     const getZValues = (key: string): number[] => {
-        return chips.map(c => c[key] || 0).filter(v => v !== 0);
+        const chipVals = chips.map(c => c[key] || 0);
+        const moduleVals = Object.values(activeModules)
+            .filter(m => m.enabled)
+            .map(m => m.values[key as StatKey] || 0);
+        
+        return [...chipVals, ...moduleVals].filter(v => v !== 0);
     };
 
     // --- Stage 1: D1 (Base Damage + Damage/Elem Bonuses) ---
-    // Combine damage and elem_damage raw values
     const dmgZ = getZValues('damage');
     const elemZ = getZValues('elem_damage');
     const d1Z = [...dmgZ, ...elemZ];
@@ -59,7 +62,6 @@ export class DamageCalculator {
     const finalStats: Stats = {};
     const mods: Record<string, number> = {};
     
-    // Explicitly casting strings to StatKey for type safety in loop
     const statKeys: StatKey[] = ["fire_rate", "range", "crit_chance", "crit_power", "overheat", "cooldown"];
     
     statKeys.forEach(key => {
@@ -76,25 +78,14 @@ export class DamageCalculator {
     const f_oh = finalStats.overheat || 0;
     const f_cd = finalStats.cooldown || 0;
     
-    // DPM Denominator
     const dpm_denom = (f_oh + f_cd) !== 0 ? (f_oh + f_cd) : 1.0;
-    
-    // Range Bonus Mod (used in Clean DPS calculation)
     const rangeMod = mods['range'] || 0;
 
     const calculateMode = (baseDmg: number) => {
-      // Clean DPS = (BaseDmg * FireRate) / 60
-      // Applied Range Bonus multiplier logic: * (1 + rangeBonus/2)
       const clean_dps = ((baseDmg * f_fr) / 60.0) * (1.0 + rangeMod / 2.0);
-      
-      // Crit DPS
       const crit_dps = clean_dps * (f_cc / 100.0) * (1.0 + (f_cp / 100.0));
-      
       const total_dps = clean_dps + crit_dps;
-      
-      // DPM
       const dpm = (60.0 / dpm_denom) * total_dps * f_oh;
-
       return { clean_dps, crit_dps, total_dps, dpm };
     };
 
@@ -112,9 +103,10 @@ export class DamageCalculator {
   static findBestReplacement(
     baseStats: Stats, 
     currentChips: Stats[], 
-    candidateChip: Stats
+    candidateChip: Stats,
+    activeModules: Record<string, ModuleState> = {}
   ): ReplacementResult[] {
-    const baseline = this.calculate(baseStats, currentChips);
+    const baseline = this.calculate(baseStats, currentChips, activeModules);
     const results: ReplacementResult[] = [];
 
     const isCandidateEmpty = Object.values(candidateChip).every(v => v === 0);
@@ -124,7 +116,7 @@ export class DamageCalculator {
         const tempChips = [...currentChips];
         tempChips[i] = candidateChip;
 
-        const newRes = this.calculate(baseStats, tempChips);
+        const newRes = this.calculate(baseStats, tempChips, activeModules);
 
         results.push({
             replaced_index: i,

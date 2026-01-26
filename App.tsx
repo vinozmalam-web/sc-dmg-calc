@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Stats, SavedConfig, StatKey, Language } from './types';
-import { DEFAULT_BASE_STATS, DEFAULT_CHIP_STATS, BASE_STATS_KEYS, CHIP_STATS_KEYS, UI_TEXT, LABELS, TOOLTIPS } from './constants';
+import { Stats, SavedConfig, StatKey, Language, ModuleState } from './types';
+import { DEFAULT_BASE_STATS, DEFAULT_CHIP_STATS, BASE_STATS_KEYS, CHIP_STATS_KEYS, UI_TEXT, LABELS, BASE_TOOLTIPS, CHIP_TOOLTIPS } from './constants';
 import { DamageCalculator } from './services/calculator';
 import { StatInput } from './components/StatInput';
 import { ResultsPanel } from './components/ResultsPanel';
 import { AnalysisPanel } from './components/AnalysisPanel';
+import { ModulesPanel } from './components/ModulesPanel';
 import { Save, FolderOpen, Trash2, Cpu, BarChart2, RefreshCcw, Globe } from 'lucide-react';
 
 const STORAGE_KEY = 'dmg_calc_configs';
@@ -15,6 +16,7 @@ export default function App() {
   const [baseStats, setBaseStats] = useState<Stats>(DEFAULT_BASE_STATS);
   const [chips, setChips] = useState<Stats[]>(Array(5).fill(DEFAULT_CHIP_STATS));
   const [candidate, setCandidate] = useState<Stats>(DEFAULT_CHIP_STATS);
+  const [activeModules, setActiveModules] = useState<Record<string, ModuleState>>({});
   const [activeChipTab, setActiveChipTab] = useState(0);
   
   // Language State
@@ -46,13 +48,14 @@ export default function App() {
 
   // --- Calculations ---
   const result = useMemo(() => {
-    return DamageCalculator.calculate(baseStats, chips);
-  }, [baseStats, chips]);
+    return DamageCalculator.calculate(baseStats, chips, activeModules);
+  }, [baseStats, chips, activeModules]);
 
   // --- Helpers ---
   const text = UI_TEXT[language];
   const labels = LABELS[language];
-  const tooltips = TOOLTIPS[language];
+  const baseTooltips = BASE_TOOLTIPS[language];
+  const chipTooltips = CHIP_TOOLTIPS[language];
 
   // --- Handlers ---
   const updateBaseStat = (key: StatKey, value: number) => {
@@ -67,6 +70,13 @@ export default function App() {
     });
   };
 
+  const updateModule = (moduleId: string, state: ModuleState) => {
+    setActiveModules(prev => ({
+      ...prev,
+      [moduleId]: state
+    }));
+  };
+
   const updateCandidate = (key: string, value: number) => {
     setCandidate(prev => ({ ...prev, [key]: value }));
   };
@@ -77,7 +87,7 @@ export default function App() {
       newChips[index] = { ...candidate };
       return newChips;
     });
-    setCandidate(DEFAULT_CHIP_STATS); // Reset candidate after apply
+    setCandidate(DEFAULT_CHIP_STATS);
   };
 
   const toggleLanguage = () => {
@@ -94,7 +104,8 @@ export default function App() {
       timestamp: Date.now(),
       baseStats,
       chips,
-      candidate
+      candidate,
+      activeModules
     };
     
     const newConfigs = [...savedConfigs.filter(c => c.name !== configName), newConfig];
@@ -106,7 +117,7 @@ export default function App() {
   const loadConfig = (config: SavedConfig) => {
     setBaseStats(config.baseStats);
     setChips(config.chips);
-    // Explicitly NOT loading candidate stats to allow comparison of the same candidate across different configs
+    setActiveModules(config.activeModules || {});
     setConfigName(config.name);
     setIsSidebarOpen(false);
   };
@@ -143,7 +154,6 @@ export default function App() {
         </div>
         
         <div className="p-4 space-y-4 flex-1 overflow-y-auto">
-            {/* Language Switcher (Sidebar) */}
            <button 
              onClick={toggleLanguage}
              className="w-full flex items-center justify-center gap-2 p-2 rounded bg-slate-900 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-800 transition-all text-sm font-medium text-slate-300"
@@ -152,7 +162,6 @@ export default function App() {
              <span>{language === 'en' ? 'English' : 'Русский'}</span>
            </button>
 
-           {/* Save Section */}
            <div className="space-y-2">
              <label className="text-xs font-semibold text-slate-500 uppercase">{text.currentConfig}</label>
              <div className="flex gap-2">
@@ -169,7 +178,6 @@ export default function App() {
              </div>
            </div>
 
-           {/* Load Section */}
            <div className="space-y-2 pt-4">
              <label className="text-xs font-semibold text-slate-500 uppercase">{text.savedConfigs}</label>
              {savedConfigs.length === 0 ? (
@@ -192,21 +200,14 @@ export default function App() {
         </div>
       </div>
 
-      {/* --- Main Content --- */}
       <div className="flex-1 flex flex-col min-w-0 bg-slate-900/50">
-        
-        {/* Mobile/Tablet Header Bar */}
         <div className="lg:hidden bg-slate-950 p-4 border-b border-slate-800 flex items-center justify-between shrink-0 z-10 shadow-md">
-          {/* Left: Sidebar Toggle */}
           <div className="w-10">
             <button onClick={() => setIsSidebarOpen(true)} className="md:hidden text-slate-300 hover:text-white transition-colors">
                <FolderOpen className="w-6 h-6" />
             </button>
           </div>
-          
           <span className="font-bold text-lg tracking-tight text-slate-100 truncate mx-2">{text.appTitle}</span>
-
-          {/* Right: Analysis Toggle */}
           <div className="w-10 flex justify-end">
             <button 
               onClick={() => setIsAnalysisOpen(true)} 
@@ -218,8 +219,6 @@ export default function App() {
         </div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 space-y-8">
-            
-            {/* Base Stats Section */}
             <div className="bg-slate-800/40 rounded-xl p-4 sm:p-6 border border-slate-700/50">
                 <div className="flex items-center gap-2 mb-4">
                   <BarChart2 className="w-5 h-5 text-blue-400" />
@@ -231,7 +230,7 @@ export default function App() {
                         key={key} 
                         statKey={key} 
                         label={labels[key]}
-                        description={tooltips[key]}
+                        description={baseTooltips[key]}
                         value={baseStats[key] || 0} 
                         onChange={updateBaseStat} 
                       />
@@ -239,7 +238,6 @@ export default function App() {
                 </div>
             </div>
 
-            {/* Chips Section */}
             <div className="bg-slate-800/40 rounded-xl p-4 sm:p-6 border border-slate-700/50">
               <div className="flex items-center justify-between mb-4">
                  <div className="flex items-center gap-2">
@@ -248,7 +246,6 @@ export default function App() {
                  </div>
               </div>
 
-              {/* Tabs */}
               <div className="flex border-b border-slate-700 mb-6 overflow-x-auto pb-1 scrollbar-none">
                 {[0, 1, 2, 3, 4].map(idx => (
                   <button
@@ -265,14 +262,13 @@ export default function App() {
                 ))}
               </div>
 
-              {/* Active Chip Inputs */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 animate-in fade-in duration-300">
                   {CHIP_STATS_KEYS.map(key => (
                     <StatInput
                       key={key}
                       statKey={key}
                       label={labels[key]}
-                      description={tooltips[key]}
+                      description={chipTooltips[key]}
                       value={chips[activeChipTab][key] || 0}
                       onChange={(k, v) => updateChipStat(activeChipTab, k, v)}
                     />
@@ -280,15 +276,20 @@ export default function App() {
               </div>
             </div>
 
-            {/* Results Display */}
+            <ModulesPanel 
+              activeModules={activeModules}
+              language={language}
+              labels={labels}
+              tooltips={chipTooltips}
+              texts={text}
+              onChange={updateModule}
+            />
+
             <ResultsPanel result={result} labels={labels} texts={text} />
-            
-            {/* Spacer for bottom scrolling on mobile */}
             <div className="h-4 lg:hidden"></div>
         </div>
       </div>
 
-      {/* --- Right Panel (Analysis) --- */}
        <div className={`
          fixed inset-y-0 right-0 z-50 h-full w-full sm:w-[400px] shadow-2xl transition-transform duration-300 transform
          ${isAnalysisOpen ? 'translate-x-0' : 'translate-x-full'}
@@ -298,9 +299,10 @@ export default function App() {
            baseStats={baseStats}
            chips={chips}
            candidate={candidate}
+           activeModules={activeModules}
            labels={labels}
            texts={text}
-           tooltips={tooltips}
+           tooltips={chipTooltips}
            onCandidateChange={updateCandidate}
            onApplyReplacement={applyReplacement}
            onResetCandidate={() => setCandidate(DEFAULT_CHIP_STATS)}

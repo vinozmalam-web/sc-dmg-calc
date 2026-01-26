@@ -49,10 +49,25 @@ export interface ReplacementResult {
   };
 }
 
+export type ModuleType = 'fixed' | 'modifiable';
+
+export interface ModuleDefinition {
+  id: string;
+  name: Record<Language, string>;
+  type: ModuleType;
+  defaultStats: Partial<Record<StatKey, number>>;
+}
+
+export interface ModuleState {
+  enabled: boolean;
+  values: Partial<Record<StatKey, number>>;
+}
+
 export interface SavedConfig {
   name: string;
   timestamp: number;
   baseStats: Stats;
   chips: Stats[];
   candidate: Stats;
+  activeModules?: Record<string, ModuleState>;
 }

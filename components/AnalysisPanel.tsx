@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Stats, StatKey } from '../types';
+import { Stats, StatKey, ModuleState } from '../types';
 import { StatInput } from './StatInput';
 import { CHIP_STATS_KEYS, UI_TEXT } from '../constants';
 import { DamageCalculator } from '../services/calculator';
@@ -9,6 +9,7 @@ interface AnalysisPanelProps {
   baseStats: Stats;
   chips: Stats[];
   candidate: Stats;
+  activeModules: Record<string, ModuleState>;
   labels: Record<StatKey, string>;
   texts: typeof UI_TEXT['en'];
   tooltips: Record<StatKey, string>;
@@ -22,6 +23,7 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   baseStats,
   chips,
   candidate,
+  activeModules,
   labels,
   texts,
   tooltips,
@@ -32,11 +34,10 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
 }) => {
   
   const recommendations = useMemo(() => {
-    return DamageCalculator.findBestReplacement(baseStats, chips, candidate);
-  }, [baseStats, chips, candidate]);
+    return DamageCalculator.findBestReplacement(baseStats, chips, candidate, activeModules);
+  }, [baseStats, chips, candidate, activeModules]);
 
   const sortedRecs = useMemo(() => {
-    // Sort by Spec Ops DPM Gain descending
     return [...recommendations].sort((a, b) => b.spec_ops.dpm_delta - a.spec_ops.dpm_delta);
   }, [recommendations]);
 
@@ -66,7 +67,6 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
       </div>
 
       <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
-        {/* Candidate Inputs */}
         <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/50 mb-6">
           <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wide">{texts.candidateStats}</h3>
           <div className="grid grid-cols-2 gap-2">
@@ -84,7 +84,6 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           </div>
         </div>
 
-        {/* Recommendations */}
         <div>
           <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wide">{texts.recommendations}</h3>
           
