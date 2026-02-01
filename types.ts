@@ -63,6 +63,7 @@ export interface ModuleDefinition {
   name: Record<Language, string>;
   type: ModuleType;
   category: ModuleCategory;
+  allowedDamageTypes?: DamageType[];
   defaultStats: Partial<Record<StatKey, number>>;
 }
 

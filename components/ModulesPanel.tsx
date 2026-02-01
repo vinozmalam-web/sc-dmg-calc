@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Box, CheckCircle2, Circle, CircleDot } from 'lucide-react';
 import { MODULES } from '../data/modules';
-import { ModuleState, StatKey, Language, ModuleDefinition } from '../types';
+import { ModuleState, StatKey, Language, ModuleDefinition, DamageType } from '../types';
 import { StatInput } from './StatInput';
 
 interface ModulesPanelProps {
@@ -11,6 +11,7 @@ interface ModulesPanelProps {
   labels: Record<StatKey, string>;
   tooltips: Record<StatKey, string>;
   texts: any;
+  selectedDamageType: DamageType;
   onChange: (moduleId: string, state: ModuleState) => void;
 }
 
@@ -20,9 +21,15 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
   labels,
   tooltips,
   texts,
+  selectedDamageType,
   onChange
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Filter modules based on damage type compatibility
+  const visibleModules = MODULES.filter(m => 
+    !m.allowedDamageTypes || m.allowedDamageTypes.includes(selectedDamageType)
+  );
 
   const handleToggle = (moduleId: string) => {
     const targetModule = MODULES.find(m => m.id === moduleId);
@@ -31,7 +38,7 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
     // Logic for Ammo (Exclusive Selection)
     if (targetModule.category === 'ammo') {
         // If enabling this ammo, disable all other ammo modules
-        MODULES.filter(m => m.category === 'ammo' && m.id !== moduleId).forEach(m => {
+        visibleModules.filter(m => m.category === 'ammo' && m.id !== moduleId).forEach(m => {
              const state = activeModules[m.id];
              if (state && state.enabled) {
                  onChange(m.id, { ...state, enabled: false });
@@ -122,8 +129,8 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
     );
   };
 
-  const ammoModules = MODULES.filter(m => m.category === 'ammo');
-  const modifierModules = MODULES.filter(m => m.category === 'modifier');
+  const ammoModules = visibleModules.filter(m => m.category === 'ammo');
+  const modifierModules = visibleModules.filter(m => m.category === 'modifier');
 
   return (
     <div className="bg-slate-800/40 rounded-xl border border-slate-700/50 overflow-hidden">
@@ -162,6 +169,12 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
                     {modifierModules.map(renderModuleItem)}
                   </div>
               </div>
+          )}
+          
+          {ammoModules.length === 0 && modifierModules.length === 0 && (
+            <div className="text-slate-500 text-center italic text-sm py-4">
+              No compatible modules for selected damage type.
+            </div>
           )}
 
         </div>

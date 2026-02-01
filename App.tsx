@@ -1,6 +1,8 @@
+
 import { useState, useEffect, useMemo } from 'react';
 import { Stats, SavedConfig, StatKey, Language, ModuleState, DamageType } from './types';
 import { DEFAULT_BASE_STATS, DEFAULT_CHIP_STATS, BASE_STATS_KEYS, CHIP_STATS_KEYS, UI_TEXT, LABELS, BASE_TOOLTIPS, CHIP_TOOLTIPS, DAMAGE_TYPE_TOOLTIPS } from './constants';
+import { MODULES } from './data/modules';
 import { DamageCalculator } from './services/calculator';
 import { StatInput } from './components/StatInput';
 import { ResultsPanel } from './components/ResultsPanel';
@@ -47,6 +49,27 @@ export default function App() {
         setLanguage(savedLang);
     }
   }, []);
+
+  // Effect to clean up incompatible modules when damage type changes
+  useEffect(() => {
+    const incompatibleModules = MODULES.filter(m => 
+      m.allowedDamageTypes && !m.allowedDamageTypes.includes(selectedDamageType)
+    );
+    
+    let hasChanges = false;
+    const newActiveModules = { ...activeModules };
+
+    incompatibleModules.forEach(m => {
+        if (newActiveModules[m.id]?.enabled) {
+            newActiveModules[m.id] = { ...newActiveModules[m.id], enabled: false };
+            hasChanges = true;
+        }
+    });
+
+    if (hasChanges) {
+        setActiveModules(newActiveModules);
+    }
+  }, [selectedDamageType]);
 
   // --- Calculations ---
   const result = useMemo(() => {
@@ -400,6 +423,7 @@ export default function App() {
               labels={labels}
               tooltips={chipTooltips}
               texts={text}
+              selectedDamageType={selectedDamageType}
               onChange={updateModule}
             />
 
