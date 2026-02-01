@@ -13,10 +13,33 @@ export const MODULES: ModuleDefinition[] = [
     }
   },
   {
+    id: 'xenon_lamp',
+    name: {
+      en: 'Ammo Lamp/Shells/Deflector',
+      ru: 'Боеприпас Лампа/Снаряды/Дефлектор'
+    },
+    type: 'fixed',
+    defaultStats: {
+      damage: 4.2
+    }
+  },
+  {
     id: 'system_horizon',
     name: {
       en: 'System Horizon',
       ru: 'Система Горизонт'
+    },
+    type: 'modifiable',
+    defaultStats: {
+      range: 40.1,
+      damage: -6.5
+    }
+  },
+  {
+    id: 'system_horizon',
+    name: {
+      en: 'System Horizon',
+      ru: 'Импульсный разрядник'
     },
     type: 'modifiable',
     defaultStats: {

@@ -1,4 +1,4 @@
-import { StatKey, Language } from './types';
+import { StatKey, Language, DamageType } from './types';
 
 export const BASE_STATS_KEYS: StatKey[] = [
   "damage",
@@ -10,9 +10,12 @@ export const BASE_STATS_KEYS: StatKey[] = [
   "cooldown"
 ];
 
+// Replaced 'elem_damage' with specific damage types
 export const CHIP_STATS_KEYS: StatKey[] = [
   "damage",
-  "elem_damage",
+  "dmg_em",
+  "dmg_thermal",
+  "dmg_kinetic",
   "dmg_destroyers",
   "dmg_aliens",
   "dmg_elidium",
@@ -34,6 +37,9 @@ export const LABELS: Record<Language, Record<StatKey, string>> = {
     overheat: "Overheat",
     cooldown: "Cooldown",
     elem_damage: "Elem. Damage",
+    dmg_em: "EM Damage",
+    dmg_thermal: "Therm. Damage",
+    dmg_kinetic: "Kinetic Damage",
     dmg_destroyers: "Dmg vs Destroyers",
     dmg_aliens: "Dmg vs Aliens",
     dmg_elidium: "Dmg vs Elidium"
@@ -47,6 +53,9 @@ export const LABELS: Record<Language, Record<StatKey, string>> = {
     overheat: "Перегрев",
     cooldown: "Остывание",
     elem_damage: "Элем. урон",
+    dmg_em: "ЭМ урон",
+    dmg_thermal: "Терм. урон",
+    dmg_kinetic: "Кинет. урон",
     dmg_destroyers: "Урон эсминцам",
     dmg_aliens: "Урон пришельцам",
     dmg_elidium: "Урон Элидиуму"
@@ -63,6 +72,9 @@ export const BASE_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     overheat: "Continuous firing time (seconds) before weapon overheats.",
     cooldown: "Time (seconds) required for the weapon to cool down completely.",
     elem_damage: "",
+    dmg_em: "",
+    dmg_thermal: "",
+    dmg_kinetic: "",
     dmg_destroyers: "",
     dmg_aliens: "",
     dmg_elidium: ""
@@ -76,6 +88,9 @@ export const BASE_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     overheat: "Время непрерывной стрельбы до перегрева (сек).",
     cooldown: "Время полного остывания оружия после перегрева (сек).",
     elem_damage: "",
+    dmg_em: "",
+    dmg_thermal: "",
+    dmg_kinetic: "",
     dmg_destroyers: "",
     dmg_aliens: "",
     dmg_elidium: ""
@@ -91,7 +106,10 @@ export const CHIP_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     crit_power: "Percentage critical power modifier (additive).",
     overheat: "Percentage modifier to weapon overheat time. Positive increases duration.",
     cooldown: "Percentage modifier to weapon cooldown time. Negative reduces wait.",
-    elem_damage: "Bonus damage (%) of the weapon's elemental type (Thermal/EM/Kinetic).",
+    elem_damage: "Bonus damage (%) of the weapon's elemental type.",
+    dmg_em: "Bonus damage (%) specifically for Electromagnetic weapons.",
+    dmg_thermal: "Bonus damage (%) specifically for Thermal weapons.",
+    dmg_kinetic: "Bonus damage (%) specifically for Kinetic weapons.",
     dmg_destroyers: "Percentage damage bonus against Destroyer class ships.",
     dmg_aliens: "Percentage damage bonus against Alien faction ships.",
     dmg_elidium: "Percentage damage bonus against Elidium faction ships/structures."
@@ -104,10 +122,26 @@ export const CHIP_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     crit_power: "Модификатор силы крита (%).",
     overheat: "Модификатор времени перегрева (%). Положительное значение увеличивает время.",
     cooldown: "Модификатор времени остывания (%). Отрицательное значение уменьшает время.",
-    elem_damage: "Бонус к урону (%) соответствующего типа (Термический/ЭМ/Кинетический).",
+    elem_damage: "Бонус к урону (%) соответствующего типа.",
+    dmg_em: "Бонус к урону (%) только для электромагнитных орудий.",
+    dmg_thermal: "Бонус к урону (%) только для термических орудий.",
+    dmg_kinetic: "Бонус к урону (%) только для кинетических орудий.",
     dmg_destroyers: "Бонус к урону (%) по кораблям класса Эсминец.",
     dmg_aliens: "Бонус к урону (%) по кораблям фракции Чужих.",
     dmg_elidium: "Бонус к урону (%) по кораблям фракции Элидиум."
+  }
+};
+
+export const DAMAGE_TYPE_TOOLTIPS: Record<Language, Record<DamageType, string>> = {
+  en: {
+    em: "Electromagnetic",
+    thermal: "Thermal",
+    kinetic: "Kinetic"
+  },
+  ru: {
+    em: "Электромагнитный",
+    thermal: "Термический",
+    kinetic: "Кинетический"
   }
 };
 
@@ -140,7 +174,9 @@ export const UI_TEXT = {
     configNamePlaceholder: "Config Name",
     emptyRecs: "Enter candidate stats to see replacement suggestions.",
     gain: "Gain",
-    loss: "Loss"
+    loss: "Loss",
+    damageType: "Damage Type",
+    legacyWarning: "Converted from legacy 'Elemental Damage'. Please verify."
   },
   ru: {
     appTitle: "Калькулятор урона чипов Star Conflict",
@@ -170,7 +206,9 @@ export const UI_TEXT = {
     configNamePlaceholder: "Название конфига",
     emptyRecs: "Введите характеристики нового чипа для сравнения.",
     gain: "Прирост",
-    loss: "Штраф"
+    loss: "Штраф",
+    damageType: "Тип урона",
+    legacyWarning: "Конвертировано из устаревшего 'Элем. урона'. Проверьте."
   }
 };
 
@@ -183,6 +221,9 @@ export const DEFAULT_BASE_STATS: Record<StatKey, number> = {
   overheat: 0,
   cooldown: 0,
   elem_damage: 0,
+  dmg_em: 0,
+  dmg_thermal: 0,
+  dmg_kinetic: 0,
   dmg_destroyers: 0,
   dmg_aliens: 0,
   dmg_elidium: 0

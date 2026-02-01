@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Stats, StatKey, ModuleState } from '../types';
+import { Stats, StatKey, ModuleState, DamageType } from '../types';
 import { StatInput } from './StatInput';
 import { CHIP_STATS_KEYS, UI_TEXT } from '../constants';
 import { DamageCalculator } from '../services/calculator';
@@ -10,9 +10,11 @@ interface AnalysisPanelProps {
   chips: Stats[];
   candidate: Stats;
   activeModules: Record<string, ModuleState>;
+  selectedDamageType: DamageType;
   labels: Record<StatKey, string>;
   texts: typeof UI_TEXT['en'];
   tooltips: Record<StatKey, string>;
+  warnings?: Record<string, string>;
   onCandidateChange: (key: string, value: number) => void;
   onApplyReplacement: (index: number) => void;
   onResetCandidate: () => void;
@@ -24,9 +26,11 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   chips,
   candidate,
   activeModules,
+  selectedDamageType,
   labels,
   texts,
   tooltips,
+  warnings = {},
   onCandidateChange,
   onApplyReplacement,
   onResetCandidate,
@@ -34,8 +38,8 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
 }) => {
   
   const recommendations = useMemo(() => {
-    return DamageCalculator.findBestReplacement(baseStats, chips, candidate, activeModules);
-  }, [baseStats, chips, candidate, activeModules]);
+    return DamageCalculator.findBestReplacement(baseStats, chips, candidate, activeModules, selectedDamageType);
+  }, [baseStats, chips, candidate, activeModules, selectedDamageType]);
 
   const sortedRecs = useMemo(() => {
     return [...recommendations].sort((a, b) => b.spec_ops.dpm_delta - a.spec_ops.dpm_delta);
@@ -77,6 +81,7 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
                 value={candidate[key] || 0}
                 label={labels[key]}
                 description={tooltips[key]}
+                warning={warnings[`candidate_${key}`]}
                 onChange={onCandidateChange}
                 compact
               />

@@ -7,11 +7,16 @@ export type StatKey =
   | "overheat"
   | "cooldown"
   | "elem_damage"
+  | "dmg_em"
+  | "dmg_thermal"
+  | "dmg_kinetic"
   | "dmg_destroyers"
   | "dmg_aliens"
   | "dmg_elidium";
 
 export type Language = 'en' | 'ru';
+
+export type DamageType = 'em' | 'thermal' | 'kinetic';
 
 export interface Stats {
   [key: string]: number;
@@ -70,4 +75,5 @@ export interface SavedConfig {
   chips: Stats[];
   candidate: Stats;
   activeModules?: Record<string, ModuleState>;
+  selectedDamageType?: DamageType;
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Stats, SavedConfig, StatKey, Language, ModuleState } from './types';
-import { DEFAULT_BASE_STATS, DEFAULT_CHIP_STATS, BASE_STATS_KEYS, CHIP_STATS_KEYS, UI_TEXT, LABELS, BASE_TOOLTIPS, CHIP_TOOLTIPS } from './constants';
+import { Stats, SavedConfig, StatKey, Language, ModuleState, DamageType } from './types';
+import { DEFAULT_BASE_STATS, DEFAULT_CHIP_STATS, BASE_STATS_KEYS, CHIP_STATS_KEYS, UI_TEXT, LABELS, BASE_TOOLTIPS, CHIP_TOOLTIPS, DAMAGE_TYPE_TOOLTIPS } from './constants';
 import { DamageCalculator } from './services/calculator';
 import { StatInput } from './components/StatInput';
 import { ResultsPanel } from './components/ResultsPanel';
@@ -17,7 +17,9 @@ export default function App() {
   const [chips, setChips] = useState<Stats[]>(Array(5).fill(DEFAULT_CHIP_STATS));
   const [candidate, setCandidate] = useState<Stats>(DEFAULT_CHIP_STATS);
   const [activeModules, setActiveModules] = useState<Record<string, ModuleState>>({});
+  const [selectedDamageType, setSelectedDamageType] = useState<DamageType>('em');
   const [activeChipTab, setActiveChipTab] = useState(0);
+  const [warnings, setWarnings] = useState<Record<string, string>>({});
   
   // Language State
   const [language, setLanguage] = useState<Language>('en');
@@ -48,18 +50,25 @@ export default function App() {
 
   // --- Calculations ---
   const result = useMemo(() => {
-    return DamageCalculator.calculate(baseStats, chips, activeModules);
-  }, [baseStats, chips, activeModules]);
+    return DamageCalculator.calculate(baseStats, chips, activeModules, selectedDamageType);
+  }, [baseStats, chips, activeModules, selectedDamageType]);
 
   // --- Helpers ---
   const text = UI_TEXT[language];
   const labels = LABELS[language];
   const baseTooltips = BASE_TOOLTIPS[language];
   const chipTooltips = CHIP_TOOLTIPS[language];
+  const damageTypeTooltips = DAMAGE_TYPE_TOOLTIPS[language];
 
   // --- Handlers ---
   const updateBaseStat = (key: StatKey, value: number) => {
     setBaseStats(prev => ({ ...prev, [key]: value }));
+    // Clear warning for this specific field if it exists
+    if (warnings[`base_${key}`]) {
+        const newW = {...warnings};
+        delete newW[`base_${key}`];
+        setWarnings(newW);
+    }
   };
 
   const updateChipStat = (chipIndex: number, key: StatKey, value: number) => {
@@ -68,6 +77,12 @@ export default function App() {
       newChips[chipIndex] = { ...newChips[chipIndex], [key]: value };
       return newChips;
     });
+    // Clear warning
+    if (warnings[`chip_${chipIndex}_${key}`]) {
+        const newW = {...warnings};
+        delete newW[`chip_${chipIndex}_${key}`];
+        setWarnings(newW);
+    }
   };
 
   const updateModule = (moduleId: string, state: ModuleState) => {
@@ -79,6 +94,11 @@ export default function App() {
 
   const updateCandidate = (key: string, value: number) => {
     setCandidate(prev => ({ ...prev, [key]: value }));
+    if (warnings[`candidate_${key}`]) {
+        const newW = {...warnings};
+        delete newW[`candidate_${key}`];
+        setWarnings(newW);
+    }
   };
 
   const applyReplacement = (index: number) => {
@@ -88,6 +108,15 @@ export default function App() {
       return newChips;
     });
     setCandidate(DEFAULT_CHIP_STATS);
+    
+    // Check if candidate had warnings and clear them, or transfer them? 
+    // Usually new candidates are fresh, but if legacy was loaded into candidate:
+    const newW = {...warnings};
+    // Clear candidate warnings
+    Object.keys(newW).forEach(k => {
+        if (k.startsWith('candidate_')) delete newW[k];
+    });
+    setWarnings(newW);
   };
 
   const toggleLanguage = () => {
@@ -105,7 +134,8 @@ export default function App() {
       baseStats,
       chips,
       candidate,
-      activeModules
+      activeModules,
+      selectedDamageType
     };
     
     const newConfigs = [...savedConfigs.filter(c => c.name !== configName), newConfig];
@@ -115,10 +145,50 @@ export default function App() {
   };
 
   const loadConfig = (config: SavedConfig) => {
-    setBaseStats(config.baseStats);
-    setChips(config.chips);
+    const newWarnings: Record<string, string> = {};
+    const textWarn = text.legacyWarning;
+
+    // Process Base Stats Legacy Conversion
+    const newBaseStats = { ...config.baseStats };
+    if (newBaseStats['elem_damage']) {
+      if (!newBaseStats['dmg_em']) {
+        newBaseStats['dmg_em'] = newBaseStats['elem_damage'];
+        newWarnings['base_dmg_em'] = textWarn;
+      }
+      delete newBaseStats['elem_damage'];
+    }
+
+    // Process Chips Legacy Conversion
+    const newChips = config.chips.map((chip, idx) => {
+      const newChip = { ...chip };
+      if (newChip['elem_damage']) {
+        if (!newChip['dmg_em']) {
+          newChip['dmg_em'] = newChip['elem_damage'];
+          newWarnings[`chip_${idx}_dmg_em`] = textWarn;
+        }
+        delete newChip['elem_damage'];
+      }
+      return newChip;
+    });
+
+    // Process Candidate Legacy Conversion
+    const newCandidate = { ...config.candidate };
+    if (newCandidate['elem_damage']) {
+      if (!newCandidate['dmg_em']) {
+        newCandidate['dmg_em'] = newCandidate['elem_damage'];
+        newWarnings['candidate_dmg_em'] = textWarn;
+      }
+      delete newCandidate['elem_damage'];
+    }
+
+    setBaseStats(newBaseStats);
+    setChips(newChips);
+    setCandidate(newCandidate);
     setActiveModules(config.activeModules || {});
+    // Default to 'em' if undefined (legacy configs)
+    setSelectedDamageType(config.selectedDamageType || 'em');
     setConfigName(config.name);
+    setWarnings(newWarnings);
     setIsSidebarOpen(false);
   };
 
@@ -224,16 +294,55 @@ export default function App() {
                   <BarChart2 className="w-5 h-5 text-blue-400" />
                   <h2 className="text-lg font-bold">{text.baseStats}</h2>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
-                    {BASE_STATS_KEYS.map(key => (
-                      <StatInput 
-                        key={key} 
-                        statKey={key} 
-                        label={labels[key]}
-                        description={baseTooltips[key]}
-                        value={baseStats[key] || 0} 
+                {/* Updated Grid for Base Stats + Damage Type Selector */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+                    
+                    {/* 1. Damage Input */}
+                    <StatInput 
+                        key="damage" 
+                        statKey="damage" 
+                        label={labels["damage"]}
+                        description={baseTooltips["damage"]}
+                        value={baseStats["damage"] || 0} 
                         onChange={updateBaseStat} 
-                      />
+                        warning={warnings['base_damage']}
+                    />
+
+                    {/* 2. Damage Type Selector */}
+                    <div className="flex flex-col relative">
+                        <label className="text-slate-400 font-medium text-sm truncate mb-1">
+                            {text.damageType}
+                        </label>
+                        <div className="bg-slate-800 border border-slate-700 rounded text-slate-100 px-3 py-2 h-[42px] flex items-center justify-center gap-4">
+                             <button 
+                               onClick={() => setSelectedDamageType('em')}
+                               title={damageTypeTooltips.em}
+                               className={`w-6 h-6 rounded-full bg-blue-500 transition-all shadow-sm ${selectedDamageType === 'em' ? 'ring-2 ring-white scale-110 opacity-100' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
+                             />
+                             <button 
+                               onClick={() => setSelectedDamageType('thermal')}
+                               title={damageTypeTooltips.thermal}
+                               className={`w-6 h-6 rounded-full bg-red-500 transition-all shadow-sm ${selectedDamageType === 'thermal' ? 'ring-2 ring-white scale-110 opacity-100' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
+                             />
+                             <button 
+                               onClick={() => setSelectedDamageType('kinetic')}
+                               title={damageTypeTooltips.kinetic}
+                               className={`w-6 h-6 rounded-full bg-yellow-400 transition-all shadow-sm ${selectedDamageType === 'kinetic' ? 'ring-2 ring-white scale-110 opacity-100' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
+                             />
+                        </div>
+                    </div>
+
+                    {/* 3. Remaining Stats */}
+                    {BASE_STATS_KEYS.filter(key => key !== 'damage').map(key => (
+                        <StatInput 
+                          key={key} 
+                          statKey={key} 
+                          label={labels[key]}
+                          description={baseTooltips[key]}
+                          value={baseStats[key] || 0} 
+                          onChange={updateBaseStat} 
+                          warning={warnings[`base_${key}`]}
+                        />
                     ))}
                 </div>
             </div>
@@ -271,6 +380,15 @@ export default function App() {
                       description={chipTooltips[key]}
                       value={chips[activeChipTab][key] || 0}
                       onChange={(k, v) => updateChipStat(activeChipTab, k, v)}
+                      warning={warnings[`chip_${activeChipTab}_${key}`]}
+                      // Dim non-selected damage types to improve UX
+                      className={
+                        (key === 'dmg_em' && selectedDamageType !== 'em') ||
+                        (key === 'dmg_thermal' && selectedDamageType !== 'thermal') ||
+                        (key === 'dmg_kinetic' && selectedDamageType !== 'kinetic') 
+                        ? 'opacity-40 grayscale' 
+                        : ''
+                      }
                     />
                   ))}
               </div>
@@ -300,9 +418,11 @@ export default function App() {
            chips={chips}
            candidate={candidate}
            activeModules={activeModules}
+           selectedDamageType={selectedDamageType}
            labels={labels}
            texts={text}
            tooltips={chipTooltips}
+           warnings={warnings}
            onCandidateChange={updateCandidate}
            onApplyReplacement={applyReplacement}
            onResetCandidate={() => setCandidate(DEFAULT_CHIP_STATS)}

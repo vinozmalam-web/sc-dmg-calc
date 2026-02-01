@@ -1,4 +1,4 @@
-import { Stats, CalculationResult, ReplacementResult, StatKey, ModuleState } from '../types';
+import { Stats, CalculationResult, ReplacementResult, StatKey, ModuleState, DamageType } from '../types';
 
 export class DamageCalculator {
   
@@ -29,7 +29,12 @@ export class DamageCalculator {
     return { value, modSum };
   }
 
-  static calculate(baseStats: Stats, chips: Stats[], activeModules: Record<string, ModuleState> = {}): CalculationResult {
+  static calculate(
+    baseStats: Stats, 
+    chips: Stats[], 
+    activeModules: Record<string, ModuleState> = {},
+    selectedDamageType: DamageType = 'em'
+  ): CalculationResult {
     // Helper to extract non-zero Z values for a specific key from all chips AND active modules
     const getZValues = (key: string): number[] => {
         const chipVals = chips.map(c => c[key] || 0);
@@ -40,10 +45,20 @@ export class DamageCalculator {
         return [...chipVals, ...moduleVals].filter(v => v !== 0);
     };
 
-    // --- Stage 1: D1 (Base Damage + Damage/Elem Bonuses) ---
-    const dmgZ = getZValues('damage');
-    const elemZ = getZValues('elem_damage');
-    const d1Z = [...dmgZ, ...elemZ];
+    // --- Stage 1: D1 (Base Damage + Generic Damage + Matching Elemental Damage) ---
+    const genericDmgZ = getZValues('damage');
+    
+    // Select the specific damage key based on user selection
+    let specificDmgZ: number[] = [];
+    if (selectedDamageType === 'em') {
+        specificDmgZ = getZValues('dmg_em');
+    } else if (selectedDamageType === 'thermal') {
+        specificDmgZ = getZValues('dmg_thermal');
+    } else if (selectedDamageType === 'kinetic') {
+        specificDmgZ = getZValues('dmg_kinetic');
+    }
+    
+    const d1Z = [...genericDmgZ, ...specificDmgZ];
     
     const d1Result = this.calculateFinalValue(baseStats.damage || 0, d1Z);
     const d1 = d1Result.value;
@@ -104,9 +119,10 @@ export class DamageCalculator {
     baseStats: Stats, 
     currentChips: Stats[], 
     candidateChip: Stats,
-    activeModules: Record<string, ModuleState> = {}
+    activeModules: Record<string, ModuleState> = {},
+    selectedDamageType: DamageType = 'em'
   ): ReplacementResult[] {
-    const baseline = this.calculate(baseStats, currentChips, activeModules);
+    const baseline = this.calculate(baseStats, currentChips, activeModules, selectedDamageType);
     const results: ReplacementResult[] = [];
 
     const isCandidateEmpty = Object.values(candidateChip).every(v => v === 0);
@@ -116,7 +132,7 @@ export class DamageCalculator {
         const tempChips = [...currentChips];
         tempChips[i] = candidateChip;
 
-        const newRes = this.calculate(baseStats, tempChips, activeModules);
+        const newRes = this.calculate(baseStats, tempChips, activeModules, selectedDamageType);
 
         results.push({
             replaced_index: i,
