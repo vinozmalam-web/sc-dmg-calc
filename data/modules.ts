@@ -27,7 +27,6 @@ export const MODULES: ModuleDefinition[] = [
     allowedDamageTypes: ['em'],
     defaultStats: {
       damage: 20,
-      range: -30 // Projectile speed mapped to Range
     }
   },
   {
@@ -53,7 +52,7 @@ export const MODULES: ModuleDefinition[] = [
     category: 'ammo',
     allowedDamageTypes: ['em'],
     defaultStats: {
-      overheat: 50 // Heat rate reduction mapped to Overheat duration
+      overheat: 50
     }
   },
   {
@@ -272,7 +271,6 @@ export const MODULES: ModuleDefinition[] = [
     category: 'ammo',
     allowedDamageTypes: ['kinetic'],
     defaultStats: {
-      range: 35, // Projectile speed mapped to Range
       damage: -10
     }
   },
