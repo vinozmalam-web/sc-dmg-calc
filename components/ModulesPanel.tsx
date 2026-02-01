@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Box, CheckCircle2, Circle, Disc, CircleDot } from 'lucide-react';
+import { ChevronDown, ChevronUp, Box, CheckCircle2, Circle, CircleDot } from 'lucide-react';
 import { MODULES } from '../data/modules';
 import { ModuleState, StatKey, Language, ModuleDefinition } from '../types';
 import { StatInput } from './StatInput';
