@@ -1,3 +1,4 @@
+
 import { ModuleDefinition } from '../types';
 
 export const MODULES: ModuleDefinition[] = [
@@ -8,6 +9,7 @@ export const MODULES: ModuleDefinition[] = [
       ru: 'Боеприпас Плоский рефлектор'
     },
     type: 'fixed',
+    category: 'ammo',
     defaultStats: {
       range: 15
     }
@@ -19,6 +21,7 @@ export const MODULES: ModuleDefinition[] = [
       ru: 'Боеприпас Лампа/Снаряды/Дефлектор'
     },
     type: 'fixed',
+    category: 'ammo',
     defaultStats: {
       damage: 4.2
     }
@@ -30,18 +33,7 @@ export const MODULES: ModuleDefinition[] = [
       ru: 'Система Горизонт'
     },
     type: 'modifiable',
-    defaultStats: {
-      range: 40.1,
-      damage: -6.5
-    }
-  },
-  {
-    id: 'system_horizon',
-    name: {
-      en: 'System Horizon',
-      ru: 'Импульсный разрядник'
-    },
-    type: 'modifiable',
+    category: 'modifier',
     defaultStats: {
       range: 40.1,
       damage: -6.5

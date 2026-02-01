@@ -1,3 +1,4 @@
+
 import { StatKey, Language, DamageType } from './types';
 
 export const BASE_STATS_KEYS: StatKey[] = [
@@ -176,7 +177,9 @@ export const UI_TEXT = {
     gain: "Gain",
     loss: "Loss",
     damageType: "Damage Type",
-    legacyWarning: "Converted from legacy 'Elemental Damage'. Please verify."
+    legacyWarning: "Converted from legacy 'Elemental Damage'. Please verify.",
+    ammo: "Ammo",
+    shipModifiers: "Ship Modifiers"
   },
   ru: {
     appTitle: "Калькулятор урона чипов Star Conflict",
@@ -208,7 +211,9 @@ export const UI_TEXT = {
     gain: "Прирост",
     loss: "Штраф",
     damageType: "Тип урона",
-    legacyWarning: "Конвертировано из устаревшего 'Элем. урона'. Проверьте."
+    legacyWarning: "Конвертировано из устаревшего 'Элем. урона'. Проверьте.",
+    ammo: "Боеприпасы",
+    shipModifiers: "Модификаторы корабля"
   }
 };
 

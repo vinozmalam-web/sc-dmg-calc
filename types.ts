@@ -1,3 +1,4 @@
+
 export type StatKey = 
   | "damage"
   | "fire_rate"
@@ -55,11 +56,13 @@ export interface ReplacementResult {
 }
 
 export type ModuleType = 'fixed' | 'modifiable';
+export type ModuleCategory = 'ammo' | 'modifier';
 
 export interface ModuleDefinition {
   id: string;
   name: Record<Language, string>;
   type: ModuleType;
+  category: ModuleCategory;
   defaultStats: Partial<Record<StatKey, number>>;
 }
 
