@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect, useMemo } from 'react';
 import { Stats, SavedConfig, StatKey, Language, ModuleState, DamageType } from './types';
 import { DEFAULT_BASE_STATS, DEFAULT_CHIP_STATS, BASE_STATS_KEYS, CHIP_STATS_KEYS, UI_TEXT, LABELS, BASE_TOOLTIPS, CHIP_TOOLTIPS, DAMAGE_TYPE_TOOLTIPS } from './constants';
@@ -8,7 +9,7 @@ import { StatInput } from './components/StatInput';
 import { ResultsPanel } from './components/ResultsPanel';
 import { AnalysisPanel } from './components/AnalysisPanel';
 import { ModulesPanel } from './components/ModulesPanel';
-import { Save, FolderOpen, Trash2, Cpu, BarChart2, RefreshCcw, Globe } from 'lucide-react';
+import { Save, FolderOpen, Trash2, Cpu, BarChart2, RefreshCcw, Globe, Check, Info, X } from 'lucide-react';
 
 const STORAGE_KEY = 'dmg_calc_configs';
 const LANG_STORAGE_KEY = 'dmg_calc_lang';
@@ -32,6 +33,9 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
 
+  // UI State
+  const [toast, setToast] = useState<{ message: string; subMessage?: string; type: 'success' | 'info' } | null>(null);
+
   // --- Effects ---
   useEffect(() => {
     // Load Configs
@@ -49,6 +53,14 @@ export default function App() {
         setLanguage(savedLang);
     }
   }, []);
+
+  // Toast Auto-dismiss
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   // Effect to clean up incompatible modules when damage type changes
   useEffect(() => {
@@ -82,6 +94,10 @@ export default function App() {
   const baseTooltips = BASE_TOOLTIPS[language];
   const chipTooltips = CHIP_TOOLTIPS[language];
   const damageTypeTooltips = DAMAGE_TYPE_TOOLTIPS[language];
+
+  const showToast = (message: string, subMessage: string = '', type: 'success' | 'info' = 'success') => {
+    setToast({ message, subMessage, type });
+  };
 
   // --- Handlers ---
   const updateBaseStat = (key: StatKey, value: number) => {
@@ -164,7 +180,7 @@ export default function App() {
     const newConfigs = [...savedConfigs.filter(c => c.name !== configName), newConfig];
     setSavedConfigs(newConfigs);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newConfigs));
-    alert(text.saveAlert);
+    showToast(text.saveAlert, '', 'success');
   };
 
   const loadConfig = (config: SavedConfig) => {
@@ -194,25 +210,31 @@ export default function App() {
       return newChip;
     });
 
-    // Process Candidate Legacy Conversion
-    const newCandidate = { ...config.candidate };
-    if (newCandidate['elem_damage']) {
-      if (!newCandidate['dmg_em']) {
-        newCandidate['dmg_em'] = newCandidate['elem_damage'];
-        newWarnings['candidate_dmg_em'] = textWarn;
-      }
-      delete newCandidate['elem_damage'];
-    }
+    // NOTE: We deliberately DO NOT load the candidate from the config.
+    // This allows the user to keep the current candidate analysis visible 
+    // while switching between different saved ship builds.
+    
+    // Preserve current candidate warnings
+    const candidateWarnings = Object.keys(warnings)
+        .filter(key => key.startsWith('candidate_'))
+        .reduce((obj, key) => {
+            obj[key] = warnings[key];
+            return obj;
+        }, {} as Record<string, string>);
 
     setBaseStats(newBaseStats);
     setChips(newChips);
-    setCandidate(newCandidate);
+    // setCandidate(newCandidate); // Skipped to preserve current candidate
     setActiveModules(config.activeModules || {});
     // Default to 'em' if undefined (legacy configs)
     setSelectedDamageType(config.selectedDamageType || 'em');
     setConfigName(config.name);
-    setWarnings(newWarnings);
+    
+    // Merge new build warnings with preserved candidate warnings
+    setWarnings({ ...candidateWarnings, ...newWarnings });
     setIsSidebarOpen(false);
+
+    showToast(`${text.configLoaded}: ${config.name}`, text.candidatePreserved, 'info');
   };
 
   const deleteConfig = (name: string) => {
@@ -220,6 +242,7 @@ export default function App() {
     const newConfigs = savedConfigs.filter(c => c.name !== name);
     setSavedConfigs(newConfigs);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newConfigs));
+    showToast(text.configDeleted, name, 'info');
   };
 
   return (
@@ -293,7 +316,7 @@ export default function App() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-900/50">
+      <div className="flex-1 flex flex-col min-w-0 bg-slate-900/50 relative">
         <div className="lg:hidden bg-slate-950 p-4 border-b border-slate-800 flex items-center justify-between shrink-0 z-10 shadow-md">
           <div className="w-10">
             <button onClick={() => setIsSidebarOpen(true)} className="md:hidden text-slate-300 hover:text-white transition-colors">
@@ -429,6 +452,25 @@ export default function App() {
 
             <ResultsPanel result={result} labels={labels} texts={text} />
             <div className="h-4 lg:hidden"></div>
+
+             {/* Toast Notification */}
+            {toast && (
+              <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-bottom-5 fade-in duration-300">
+                <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-700 text-slate-200 px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px]">
+                  <div className={`p-2 rounded-full flex-shrink-0 ${toast.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                    {toast.type === 'success' ? <Check className="w-5 h-5" /> : <Info className="w-5 h-5" />}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-sm">{toast.message}</div>
+                    {toast.subMessage && <div className="text-xs text-slate-400 mt-0.5">{toast.subMessage}</div>}
+                  </div>
+                  <button onClick={() => setToast(null)} className="text-slate-500 hover:text-white p-1 rounded-md hover:bg-slate-700/50 transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
         </div>
       </div>
 
