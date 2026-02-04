@@ -13,6 +13,7 @@ import { Save, FolderOpen, Trash2, Cpu, BarChart2, RefreshCcw, Globe, Check, Inf
 
 const STORAGE_KEY = 'dmg_calc_configs';
 const LANG_STORAGE_KEY = 'dmg_calc_lang';
+const APP_VERSION = '0.5.0';
 
 export default function App() {
   // --- State ---
@@ -451,6 +452,11 @@ export default function App() {
             />
 
             <ResultsPanel result={result} labels={labels} texts={text} />
+            
+            <div className="w-full flex justify-center mt-8 pb-4">
+                <span className="text-xs font-mono text-slate-600 select-none">v{APP_VERSION}</span>
+            </div>
+
             <div className="h-4 lg:hidden"></div>
 
              {/* Toast Notification */}
