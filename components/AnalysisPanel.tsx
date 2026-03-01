@@ -112,7 +112,7 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
                     </button>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4 text-xs">
+                  <div className="grid grid-cols-3 gap-4 text-xs">
                     <div>
                       <div className="text-slate-400 mb-1">{texts.specOps} {texts.dpm}</div>
                       <div className={`font-mono font-bold flex items-center gap-1 ${rec.spec_ops.dpm_delta >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
@@ -124,6 +124,12 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
                       <div className="text-slate-400 mb-1">{texts.general} {texts.dpm}</div>
                       <div className={`font-mono font-bold flex items-center gap-1 ${rec.general.dpm_delta >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                          {rec.general.dpm_delta > 0 ? '+' : ''}{rec.general.dpm_delta.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-slate-400 mb-1">{labels.range}</div>
+                      <div className={`font-mono font-bold flex items-center gap-1 ${rec.range_delta >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                         {rec.range_delta > 0 ? '+' : ''}{rec.range_delta.toLocaleString(undefined, { maximumFractionDigits: 1 })}
                       </div>
                     </div>
                   </div>

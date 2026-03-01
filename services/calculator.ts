@@ -94,10 +94,9 @@ export class DamageCalculator {
     const f_cd = finalStats.cooldown || 0;
     
     const dpm_denom = (f_oh + f_cd) !== 0 ? (f_oh + f_cd) : 1.0;
-    const rangeMod = mods['range'] || 0;
 
     const calculateMode = (baseDmg: number) => {
-      const clean_dps = ((baseDmg * f_fr) / 60.0) * (1.0 + rangeMod / 2.0);
+      const clean_dps = ((baseDmg * f_fr) / 60.0);
       const crit_dps = clean_dps * (f_cc / 100.0) * (1.0 + (f_cp / 100.0));
       const total_dps = clean_dps + crit_dps;
       const dpm = (60.0 / dpm_denom) * total_dps * f_oh;
@@ -145,7 +144,8 @@ export class DamageCalculator {
                 dpm_delta: newRes.general.dpm - baseline.general.dpm,
                 dps_delta: newRes.general.total_dps - baseline.general.total_dps,
                 new_dpm: newRes.general.dpm,
-            }
+            },
+            range_delta: (newRes.final_stats.range || 0) - (baseline.final_stats.range || 0)
         });
     }
 

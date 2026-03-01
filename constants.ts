@@ -103,7 +103,7 @@ export const CHIP_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
   en: {
     damage: "Percentage damage modifier.",
     fire_rate: "Percentage fire rate modifier.",
-    range: "Percentage range modifier. !Adds fake DPS!(50% from bonus. Only in calc. NOT in the game!)",
+    range: "Percentage range modifier.",
     crit_chance: "Percentage critical chance modifier (additive).",
     crit_power: "Percentage critical power modifier (additive).",
     overheat: "Percentage modifier to weapon overheat time. Positive increases duration.",
@@ -119,7 +119,7 @@ export const CHIP_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
   ru: {
     damage: "Модификатор урона (%).",
     fire_rate: "Модификатор скорострельности (%).",
-    range: "Модификатор дальности (%). !Добавляет ненастоящий ДПС (50% от бонуса, только в калькуляторе. Не в игре!",
+    range: "Модификатор дальности (%).",
     crit_chance: "Модификатор шанса крита (%).",
     crit_power: "Модификатор силы крита (%).",
     overheat: "Модификатор времени перегрева (%). Положительное значение увеличивает время.",

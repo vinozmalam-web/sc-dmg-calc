@@ -53,6 +53,7 @@ export interface ReplacementResult {
     dps_delta: number;
     new_dpm: number;
   };
+  range_delta: number;
 }
 
 export type ModuleType = 'fixed' | 'modifiable';
