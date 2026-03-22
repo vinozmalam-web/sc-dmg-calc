@@ -183,7 +183,14 @@ export const UI_TEXT = {
     shipModifiers: "Ship Modifiers",
     configLoaded: "Configuration loaded",
     candidatePreserved: "",
-    configDeleted: "Configuration deleted"
+    configDeleted: "Configuration deleted",
+    newConfig: "New Ship",
+    newConfigCreated: "New empty configuration created",
+    exportBackup: "Export Backup",
+    configExported: "Configuration exported",
+    importBackup: "Import Backup",
+    importSuccess: "Configurations imported",
+    importError: "Invalid backup file"
   },
   ru: {
     appTitle: "Калькулятор урона чипов Star Conflict",
@@ -220,7 +227,14 @@ export const UI_TEXT = {
     shipModifiers: "Модификаторы корабля",
     configLoaded: "Конфигурация загружена",
     candidatePreserved: "",
-    configDeleted: "Конфигурация удалена"
+    configDeleted: "Конфигурация удалена",
+    newConfig: "Новый корабль",
+    newConfigCreated: "Создана новая пустая конфигурация",
+    exportBackup: "Экспорт бэкапа",
+    configExported: "Конфигурация экспортирована",
+    importBackup: "Импорт бэкапа",
+    importSuccess: "Конфигурации импортированы",
+    importError: "Неверный файл бэкапа"
   }
 };
 

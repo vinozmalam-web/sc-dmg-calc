@@ -9,7 +9,7 @@ import { StatInput } from './components/StatInput';
 import { ResultsPanel } from './components/ResultsPanel';
 import { AnalysisPanel } from './components/AnalysisPanel';
 import { ModulesPanel } from './components/ModulesPanel';
-import { Save, FolderOpen, Trash2, Cpu, BarChart2, RefreshCcw, Globe, Check, Info, X } from 'lucide-react';
+import { Save, FolderOpen, Trash2, Cpu, BarChart2, RefreshCcw, Globe, Check, Info, X, Plus, Download, Upload } from 'lucide-react';
 
 const STORAGE_KEY = 'dmg_calc_configs';
 const LANG_STORAGE_KEY = 'dmg_calc_lang';
@@ -246,6 +246,68 @@ export default function App() {
     showToast(text.configDeleted, name, 'info');
   };
 
+  const createNewConfig = () => {
+    setBaseStats(DEFAULT_BASE_STATS);
+    setChips(Array(5).fill(DEFAULT_CHIP_STATS));
+    setCandidate(DEFAULT_CHIP_STATS);
+    setActiveModules({});
+    setSelectedDamageType('em');
+    setConfigName("");
+    setWarnings({});
+    setIsSidebarOpen(false);
+    showToast(text.newConfigCreated, '', 'info');
+  };
+
+  const exportBackup = () => {
+    if (savedConfigs.length === 0) {
+      showToast(text.noSavedConfigs, '', 'info');
+      return;
+    }
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedConfigs, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "damage_calc_backup.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+    showToast(text.configExported, '', 'success');
+  };
+
+  const importBackup = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const content = event.target?.result as string;
+          const parsed = JSON.parse(content);
+          if (Array.isArray(parsed)) {
+            setSavedConfigs(prev => {
+              const existingMap = new Map(prev.map(c => [c.name, c]));
+              parsed.forEach(c => {
+                if (c.name) existingMap.set(c.name, c);
+              });
+              const mergedConfigs = Array.from(existingMap.values());
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedConfigs));
+              return mergedConfigs;
+            });
+            showToast(text.importSuccess, '', 'success');
+          } else {
+            throw new Error("Invalid format");
+          }
+        } catch (err) {
+          showToast(text.importError, '', 'info');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
   return (
     <div className="flex h-screen bg-slate-900 text-slate-100 font-sans overflow-hidden">
       
@@ -277,6 +339,14 @@ export default function App() {
            >
              <Globe className="w-4 h-4" />
              <span>{language === 'en' ? 'English' : 'Русский'}</span>
+           </button>
+
+           <button 
+             onClick={createNewConfig}
+             className="w-full flex items-center justify-center gap-2 p-2 rounded bg-emerald-600/20 border border-emerald-500/30 hover:bg-emerald-600/30 hover:border-emerald-500/50 transition-all text-sm font-medium text-emerald-400"
+           >
+             <Plus className="w-4 h-4" />
+             <span>{text.newConfig}</span>
            </button>
 
            <div className="space-y-2">
@@ -313,6 +383,24 @@ export default function App() {
                  ))}
                </div>
              )}
+
+             <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-800">
+               <button 
+                 onClick={importBackup}
+                 className="flex items-center justify-center gap-2 p-2 rounded bg-slate-800 border border-slate-700 hover:border-slate-500 hover:bg-slate-700 transition-all text-sm font-medium text-slate-300"
+               >
+                 <Upload className="w-4 h-4" />
+                 <span>{text.importBackup}</span>
+               </button>
+               <button 
+                 onClick={exportBackup}
+                 disabled={savedConfigs.length === 0}
+                 className={`flex items-center justify-center gap-2 p-2 rounded border transition-all text-sm font-medium ${savedConfigs.length === 0 ? 'bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed' : 'bg-slate-800 border-slate-700 hover:border-slate-500 hover:bg-slate-700 text-slate-300'}`}
+               >
+                 <Download className="w-4 h-4" />
+                 <span>{text.exportBackup}</span>
+               </button>
+             </div>
            </div>
         </div>
       </div>
