@@ -13,6 +13,7 @@ interface StatInputProps {
   compact?: boolean;
   headerRight?: React.ReactNode;
   warning?: string;
+  min?: number;
 }
 
 const TooltipPortal = ({ content, targetRect, visible, isWarning }: { content: string, targetRect: DOMRect | null, visible: boolean, isWarning?: boolean }) => {
@@ -41,14 +42,23 @@ const TooltipPortal = ({ content, targetRect, visible, isWarning }: { content: s
     );
 };
 
-export const StatInput: React.FC<StatInputProps> = ({ statKey, value, label, description, onChange, className = "", compact = false, headerRight, warning }) => {
+export const StatInput: React.FC<StatInputProps> = ({ statKey, value, label, description, onChange, className = "", compact = false, headerRight, warning, min }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const iconRef = useRef<HTMLDivElement>(null);
   const [rect, setRect] = useState<DOMRect | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseFloat(e.target.value);
-    onChange(statKey, isNaN(val) ? 0 : val);
+    let val = parseFloat(e.target.value);
+    if (isNaN(val)) val = 0;
+    onChange(statKey, val);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    let val = parseFloat(e.target.value);
+    if (isNaN(val)) val = 0;
+    if (min !== undefined && val < min) {
+      onChange(statKey, min);
+    }
   };
 
   const handleMouseEnter = () => {
@@ -92,7 +102,9 @@ export const StatInput: React.FC<StatInputProps> = ({ statKey, value, label, des
         type="number"
         value={value || ''}
         placeholder="0"
+        min={min}
         onChange={handleChange}
+        onBlur={handleBlur}
         className={`
           bg-slate-800 border rounded text-slate-100 
           focus:ring-2 outline-none transition-all w-full

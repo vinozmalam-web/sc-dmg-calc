@@ -13,7 +13,8 @@ export type StatKey =
   | "dmg_kinetic"
   | "dmg_destroyers"
   | "dmg_aliens"
-  | "dmg_elidium";
+  | "dmg_elidium"
+  | "number_of_cannons";
 
 export type Language = 'en' | 'ru';
 
@@ -57,7 +58,7 @@ export interface ReplacementResult {
 }
 
 export type ModuleType = 'fixed' | 'modifiable';
-export type ModuleCategory = 'ammo' | 'modifier';
+export type ModuleCategory = 'ammo' | 'modifier' | 'implant';
 
 export interface ModuleDefinition {
   id: string;
@@ -66,6 +67,7 @@ export interface ModuleDefinition {
   category: ModuleCategory;
   allowedDamageTypes?: DamageType[];
   defaultStats: Partial<Record<StatKey, number>>;
+  rank?: number;
 }
 
 export interface ModuleState {

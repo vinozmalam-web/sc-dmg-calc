@@ -77,7 +77,7 @@ export class DamageCalculator {
     const finalStats: Stats = {};
     const mods: Record<string, number> = {};
     
-    const statKeys: StatKey[] = ["fire_rate", "range", "crit_chance", "crit_power", "overheat", "cooldown"];
+    const statKeys: StatKey[] = ["fire_rate", "range", "crit_chance", "crit_power", "cooldown"];
     
     statKeys.forEach(key => {
         const zVals = getZValues(key);
@@ -85,6 +85,47 @@ export class DamageCalculator {
         finalStats[key] = res.value;
         mods[key] = res.modSum;
     });
+
+    // --- Overheat Calculation ---
+    const rofZVals = getZValues('fire_rate');
+    const coolZVals = getZValues('overheat');
+
+    let overheatModTotal = 0;
+
+    // Fire rate mapping: Z_math = Z_ui
+    rofZVals.forEach(z => {
+        overheatModTotal += this.getMod(z);
+    });
+
+    // Cooling mapping: Z_math = -Z_ui
+    coolZVals.forEach(z => {
+        overheatModTotal += this.getMod(-z);
+    });
+
+    let tFinal = 0;
+    if (baseStats.overheat && baseStats.overheat > 0) {
+        if (overheatModTotal > 0) {
+            tFinal = baseStats.overheat / (1 + overheatModTotal);
+        } else {
+            tFinal = baseStats.overheat * (1 - overheatModTotal);
+        }
+        if (tFinal <= 0) tFinal = 0.01;
+    } else if (baseStats.overheat && baseStats.overheat < 0) {
+        if (overheatModTotal > 0) {
+            tFinal = baseStats.overheat / (1 + overheatModTotal);
+        } else {
+            tFinal = baseStats.overheat * (1 - overheatModTotal);
+        }
+        if (tFinal >= 0) tFinal = -0.01;
+    }
+
+    finalStats.overheat = tFinal;
+
+    let cannons = baseStats.number_of_cannons !== undefined ? baseStats.number_of_cannons : 1;
+    if (cannons < 1) cannons = 1;
+    if (finalStats.fire_rate !== undefined) {
+        finalStats.fire_rate *= cannons;
+    }
 
     // --- Stage 5: Final DPS/DPM Calculations ---
     const f_fr = finalStats.fire_rate || 0;
@@ -99,8 +140,16 @@ export class DamageCalculator {
       const clean_dps = ((baseDmg * f_fr) / 60.0);
       const crit_dps = clean_dps * (f_cc / 100.0) * (1.0 + (f_cp / 100.0));
       const total_dps = clean_dps + crit_dps;
-      const dpm = (60.0 / dpm_denom) * total_dps * f_oh;
-      return { clean_dps, crit_dps, total_dps, dpm };
+      const dpm = f_oh > 0 
+        ? (60.0 / dpm_denom) * total_dps * f_oh 
+        : total_dps * 60.0;
+      
+      return { 
+        clean_dps: clean_dps, 
+        crit_dps: crit_dps, 
+        total_dps: total_dps, 
+        dpm: dpm 
+      };
     };
 
     const spec_ops = calculateMode(d3);

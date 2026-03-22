@@ -25,8 +25,6 @@ const DpsSection = ({ title, stats, colorClass, texts }: { title: string; stats:
     <div className="grid grid-cols-2 gap-3">
       <StatCard label={texts.dpm} value={stats.dpm.toLocaleString(undefined, { maximumFractionDigits: 1 })} />
       <StatCard label={texts.totalDps} value={stats.total_dps.toLocaleString(undefined, { maximumFractionDigits: 1 })} />
-      <StatCard label={texts.cleanDps} value={stats.clean_dps.toLocaleString(undefined, { maximumFractionDigits: 1 })} />
-      <StatCard label={texts.critDps} value={stats.crit_dps.toLocaleString(undefined, { maximumFractionDigits: 1 })} />
     </div>
   </div>
 );
@@ -62,7 +60,9 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({ result, labels, text
                 <span className="text-xs text-slate-400 font-medium">{labels[key]}</span>
               </div>
               <span className="text-lg font-bold text-white">
-                {result.final_stats[key]?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? "0"}
+                {key === 'overheat' 
+                  ? result.final_stats[key]?.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) ?? "0.0"
+                  : result.final_stats[key]?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? "0"}
               </span>
             </div>
           ))}

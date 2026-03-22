@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Box, CheckCircle2, Circle, CircleDot } from 'lucide-react';
+import { ChevronDown, ChevronUp, CheckCircle2, Circle, CircleDot, Crosshair, Layers, Cpu } from 'lucide-react';
 import { MODULES } from '../data/modules';
 import { ModuleState, StatKey, Language, ModuleDefinition, DamageType } from '../types';
 import { StatInput } from './StatInput';
@@ -24,7 +24,9 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
   selectedDamageType,
   onChange
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isAmmoOpen, setIsAmmoOpen] = useState(false);
+  const [isModifiersOpen, setIsModifiersOpen] = useState(false);
+  const [isImplantsOpen, setIsImplantsOpen] = useState(false);
 
   // Filter modules based on damage type compatibility
   const visibleModules = MODULES.filter(m => 
@@ -57,6 +59,28 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
       enabled: !currentState.enabled,
       values
     });
+  };
+
+  const handleImplantSelect = (rank: number, moduleId: string) => {
+    // Disable all implants of this rank
+    const implantsOfRank = visibleModules.filter(m => m.category === 'implant' && m.rank === rank);
+    implantsOfRank.forEach(m => {
+      const state = activeModules[m.id];
+      if (state && state.enabled && m.id !== moduleId) {
+        onChange(m.id, { ...state, enabled: false });
+      }
+    });
+
+    if (moduleId) {
+      const targetModule = MODULES.find(m => m.id === moduleId);
+      if (targetModule) {
+        const currentState = activeModules[moduleId] || { enabled: false, values: {} };
+        const values = Object.keys(currentState.values).length > 0 
+          ? currentState.values 
+          : (targetModule.defaultStats || {});
+        onChange(moduleId, { ...currentState, enabled: true, values });
+      }
+    }
   };
 
   const handleStatChange = (moduleId: string, key: StatKey, value: number) => {
@@ -131,54 +155,157 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
 
   const ammoModules = visibleModules.filter(m => m.category === 'ammo');
   const modifierModules = visibleModules.filter(m => m.category === 'modifier');
+  const implantModules = visibleModules.filter(m => m.category === 'implant');
+
+  // Group implants by rank
+  const implantsByRank = implantModules.reduce((acc, module) => {
+    const rank = module.rank || 0;
+    if (!acc[rank]) acc[rank] = [];
+    acc[rank].push(module);
+    return acc;
+  }, {} as Record<number, ModuleDefinition[]>);
+
+  const sortedRanks = Object.keys(implantsByRank).map(Number).sort((a, b) => a - b);
+
+  const getImplantDisplayName = (m: ModuleDefinition) => {
+    const code = m.id.replace('implant_', '').replace('_', '-');
+    const bonuses = Object.entries(m.defaultStats).map(([key, val]) => {
+      const sign = (val as number) > 0 ? '+' : '';
+      return `${sign}${val}% ${labels[key as StatKey]}`;
+    }).join(', ');
+    return `${code} (${bonuses})`;
+  };
 
   return (
-    <div className="bg-slate-800/40 rounded-xl border border-slate-700/50 overflow-hidden">
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 sm:p-6 hover:bg-slate-700/30 transition-colors"
-      >
-        <div className="flex items-center gap-2">
-          <Box className="w-5 h-5 text-indigo-400" />
-          <h2 className="text-lg font-bold">{texts.modules}</h2>
-          <span className="ml-2 px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-xs rounded-full">
-            {(Object.values(activeModules) as ModuleState[]).filter(m => m.enabled).length}
-          </span>
-        </div>
-        {isOpen ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
-      </button>
+    <div className="space-y-6">
+      {/* Ammo Panel */}
+      <div className="bg-slate-800/40 rounded-xl border border-slate-700/50 overflow-hidden">
+        <button 
+          onClick={() => setIsAmmoOpen(!isAmmoOpen)}
+          className="w-full flex items-center justify-between p-4 sm:p-6 hover:bg-slate-700/30 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Crosshair className="w-5 h-5 text-indigo-400" />
+            <h2 className="text-lg font-bold">{texts.ammo}</h2>
+            <span className="ml-2 px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-xs rounded-full">
+              {ammoModules.filter(m => activeModules[m.id]?.enabled).length}
+            </span>
+          </div>
+          {isAmmoOpen ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+        </button>
 
-      {isOpen && (
-        <div className="p-4 sm:p-6 pt-0 space-y-6 border-t border-slate-700/50 animate-in slide-in-from-top-2 duration-200">
-          
-          {/* Ammo Section */}
-          {ammoModules.length > 0 && (
+        {isAmmoOpen && (
+          <div className="p-4 sm:p-6 pt-0 space-y-3 border-t border-slate-700/50 animate-in slide-in-from-top-2 duration-200">
+            {ammoModules.length > 0 ? (
               <div className="space-y-3">
-                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">{texts.ammo}</h3>
-                  <div className="space-y-3">
-                    {ammoModules.map(renderModuleItem)}
-                  </div>
+                {ammoModules.map(renderModuleItem)}
               </div>
-          )}
+            ) : (
+              <div className="text-slate-500 text-center italic text-sm py-4">
+                {texts.noAmmo}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
-          {/* Modifiers Section */}
-          {modifierModules.length > 0 && (
+      {/* Modifiers Panel */}
+      <div className="bg-slate-800/40 rounded-xl border border-slate-700/50 overflow-hidden">
+        <button 
+          onClick={() => setIsModifiersOpen(!isModifiersOpen)}
+          className="w-full flex items-center justify-between p-4 sm:p-6 hover:bg-slate-700/30 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Layers className="w-5 h-5 text-indigo-400" />
+            <h2 className="text-lg font-bold">{texts.shipModifiers}</h2>
+            <span className="ml-2 px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-xs rounded-full">
+              {modifierModules.filter(m => activeModules[m.id]?.enabled).length}
+            </span>
+          </div>
+          {isModifiersOpen ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+        </button>
+
+        {isModifiersOpen && (
+          <div className="p-4 sm:p-6 pt-0 space-y-3 border-t border-slate-700/50 animate-in slide-in-from-top-2 duration-200">
+            {modifierModules.length > 0 ? (
               <div className="space-y-3">
-                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">{texts.shipModifiers}</h3>
-                  <div className="space-y-3">
-                    {modifierModules.map(renderModuleItem)}
-                  </div>
+                {modifierModules.map(renderModuleItem)}
               </div>
-          )}
-          
-          {ammoModules.length === 0 && modifierModules.length === 0 && (
-            <div className="text-slate-500 text-center italic text-sm py-4">
-              No compatible modules for selected damage type.
-            </div>
-          )}
+            ) : (
+              <div className="text-slate-500 text-center italic text-sm py-4">
+                {texts.noModules}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
-        </div>
-      )}
+      {/* Implants Panel */}
+      <div className="bg-slate-800/40 rounded-xl border border-slate-700/50 overflow-hidden">
+        <button 
+          onClick={() => setIsImplantsOpen(!isImplantsOpen)}
+          className="w-full flex items-center justify-between p-4 sm:p-6 hover:bg-slate-700/30 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Cpu className="w-5 h-5 text-indigo-400" />
+            <h2 className="text-lg font-bold">{texts.implants}</h2>
+            <span className="ml-2 px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-xs rounded-full">
+              {implantModules.filter(m => activeModules[m.id]?.enabled).length}
+            </span>
+          </div>
+          {isImplantsOpen ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+        </button>
+
+        {isImplantsOpen && (
+          <div className="p-4 sm:p-6 pt-0 space-y-4 border-t border-slate-700/50 animate-in slide-in-from-top-2 duration-200">
+            {sortedRanks.length > 0 ? (
+              <div className="space-y-4">
+                {sortedRanks.map(rank => {
+                  const implants = implantsByRank[rank];
+                  const activeImplant = implants.find(m => activeModules[m.id]?.enabled);
+                  
+                  return (
+                    <div key={rank} className="p-4 rounded-lg border bg-slate-900/30 border-slate-700/50">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                        <span className="text-sm font-bold text-slate-300 min-w-[80px]">
+                          {texts.rank} {rank}
+                        </span>
+                        <select
+                          className="flex-1 bg-slate-800 border border-slate-600 text-slate-200 text-sm rounded-md px-3 py-2 focus:outline-none focus:border-indigo-500"
+                          value={activeImplant ? activeImplant.id : ""}
+                          onChange={(e) => handleImplantSelect(rank, e.target.value)}
+                        >
+                          <option value="">--</option>
+                          {implants.map(m => (
+                            <option key={m.id} value={m.id}>
+                              {getImplantDisplayName(m)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      {activeImplant && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pl-0 sm:pl-[92px] animate-in fade-in slide-in-from-left-2">
+                          {Object.entries(activeImplant.defaultStats).map(([key, val]) => (
+                            <div key={key} className="flex flex-col">
+                              <span className="text-xs text-slate-500 font-medium">{labels[key as StatKey]}</span>
+                              <span className="text-sm font-bold text-indigo-400">+{val}%</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-slate-500 text-center italic text-sm py-4">
+                {texts.noImplants}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

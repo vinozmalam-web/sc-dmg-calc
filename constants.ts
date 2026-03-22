@@ -3,6 +3,7 @@
 import { StatKey, Language, DamageType } from './types';
 
 export const BASE_STATS_KEYS: StatKey[] = [
+  "number_of_cannons",
   "damage",
   "fire_rate",
   "range",
@@ -31,6 +32,7 @@ export const CHIP_STATS_KEYS: StatKey[] = [
 
 export const LABELS: Record<Language, Record<StatKey, string>> = {
   en: {
+    number_of_cannons: "Number of Cannons",
     damage: "Damage",
     fire_rate: "Fire Rate",
     range: "Range",
@@ -47,6 +49,7 @@ export const LABELS: Record<Language, Record<StatKey, string>> = {
     dmg_elidium: "Dmg vs Elidium"
   },
   ru: {
+    number_of_cannons: "Количество орудий",
     damage: "Урон",
     fire_rate: "Скоростр.",
     range: "Дальность",
@@ -66,6 +69,7 @@ export const LABELS: Record<Language, Record<StatKey, string>> = {
 
 export const BASE_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
   en: {
+    number_of_cannons: "Number of cannons equipped on the ship.",
     damage: "Base weapon damage per shot before modifiers.",
     fire_rate: "Base rate of fire in rounds per minute (RPM).",
     range: "Base maximum effective firing range in meters.",
@@ -82,6 +86,7 @@ export const BASE_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     dmg_elidium: ""
   },
   ru: {
+    number_of_cannons: "Количество орудий, установленных на корабле.",
     damage: "Базовый урон орудия за один выстрел.",
     fire_rate: "Базовая скорострельность (выстрелов в минуту).",
     range: "Базовая максимальная дальность стрельбы (метры).",
@@ -101,6 +106,7 @@ export const BASE_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
 
 export const CHIP_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
   en: {
+    number_of_cannons: "",
     damage: "Percentage damage modifier.",
     fire_rate: "Percentage fire rate modifier.",
     range: "Percentage range modifier.",
@@ -117,6 +123,7 @@ export const CHIP_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     dmg_elidium: "Percentage damage bonus against Elidium faction ships/structures."
   },
   ru: {
+    number_of_cannons: "",
     damage: "Модификатор урона (%).",
     fire_rate: "Модификатор скорострельности (%).",
     range: "Модификатор дальности (%).",
@@ -153,7 +160,7 @@ export const UI_TEXT = {
     currentConfig: "Current Config",
     savedConfigs: "Saved Configurations",
     noSavedConfigs: "No saved configs.",
-    baseStats: "Base Weapon Statistics",
+    baseStats: "Base Weapon Statistics (from Atlas)",
     chipsConfig: "Chips Configuration",
     modules: "Modules",
     chip: "Chip",
@@ -190,14 +197,19 @@ export const UI_TEXT = {
     configExported: "Configuration exported",
     importBackup: "Import Backup",
     importSuccess: "Configurations imported",
-    importError: "Invalid backup file"
+    importError: "Invalid backup file",
+    noAmmo: "No compatible ammo for selected damage type.",
+    noModules: "No compatible modules for selected damage type.",
+    implants: "Implants",
+    noImplants: "No compatible implants for selected damage type.",
+    rank: "Rank"
   },
   ru: {
     appTitle: "Калькулятор урона чипов Star Conflict",
     currentConfig: "Текущая конфигурация",
     savedConfigs: "Сохраненные",
     noSavedConfigs: "Нет сохраненных.",
-    baseStats: "Базовые параметры оружия",
+    baseStats: "Базовые параметры оружия (из Атласа)",
     chipsConfig: "Настройка чипов",
     modules: "Модули",
     chip: "Чип",
@@ -234,11 +246,17 @@ export const UI_TEXT = {
     configExported: "Конфигурация экспортирована",
     importBackup: "Импорт бэкапа",
     importSuccess: "Конфигурации импортированы",
-    importError: "Неверный файл бэкапа"
+    importError: "Неверный файл бэкапа",
+    noAmmo: "Нет совместимых боеприпасов для выбранного типа урона.",
+    noModules: "Нет совместимых модулей для выбранного типа урона.",
+    implants: "Импланты",
+    noImplants: "Нет совместимых имплантов для выбранного типа урона.",
+    rank: "Ранг"
   }
 };
 
 export const DEFAULT_BASE_STATS: Record<StatKey, number> = {
+  number_of_cannons: 1,
   damage: 0,
   fire_rate: 0,
   range: 0,

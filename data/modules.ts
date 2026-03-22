@@ -356,5 +356,139 @@ export const MODULES: ModuleDefinition[] = [
       range: 40.1,
       damage: -6.5
     }
+  },
+
+  // --- Implants ---
+  {
+    id: 'implant_2_1',
+    name: {
+      en: 'Neurocontroller "Oculus"',
+      ru: 'Нейроконтроллер «Oculus»'
+    },
+    type: 'fixed',
+    category: 'implant',
+    rank: 2,
+    defaultStats: {
+      crit_chance: 10
+    }
+  },
+  {
+    id: 'implant_2_2',
+    name: {
+      en: 'Neurocontroller "Albatross"',
+      ru: 'Нейроконтроллер «Альбатрос»'
+    },
+    type: 'fixed',
+    category: 'implant',
+    rank: 2,
+    defaultStats: {
+      range: 20
+    }
+  },
+  {
+    id: 'implant_6_1',
+    name: {
+      en: 'Alpha-inhibitor "Gladius"',
+      ru: 'Альфа-ингибитор «Gladius»'
+    },
+    type: 'fixed',
+    category: 'implant',
+    rank: 6,
+    defaultStats: {
+      damage: 7
+    }
+  },
+  {
+    id: 'implant_6_2',
+    name: {
+      en: 'Alpha-inhibitor "Ox"',
+      ru: 'Альфа-ингибитор «Вол»'
+    },
+    type: 'fixed',
+    category: 'implant',
+    rank: 6,
+    defaultStats: {
+      crit_power: 30
+    }
+  },
+  {
+    id: 'implant_6_3',
+    name: {
+      en: 'Alpha-inhibitor "WPN-FS2"',
+      ru: 'Альфа-ингибитор «WPN-FS2»'
+    },
+    type: 'fixed',
+    category: 'implant',
+    rank: 6,
+    allowedDamageTypes: ['thermal'],
+    defaultStats: {
+      overheat: 10,
+      cooldown: -10
+    }
+  },
+  {
+    id: 'implant_11_2',
+    name: {
+      en: 'Neuroaccelerator "Ant"',
+      ru: 'Нейроускоритель «Муравей»'
+    },
+    type: 'fixed',
+    category: 'implant',
+    rank: 11,
+    defaultStats: {
+      fire_rate: 8
+    }
+  },
+  {
+    id: 'implant_12_1',
+    name: {
+      en: 'Neuroaccelerator "Gladius II"',
+      ru: 'Нейроускоритель «Gladius II»'
+    },
+    type: 'fixed',
+    category: 'implant',
+    rank: 12,
+    defaultStats: {
+      damage: 7
+    }
+  },
+  {
+    id: 'implant_13_2',
+    name: {
+      en: 'Neuroconnector "Ant II"',
+      ru: 'Нейроконнектор «Муравей II»'
+    },
+    type: 'fixed',
+    category: 'implant',
+    rank: 13,
+    defaultStats: {
+      damage: 15
+    }
+  },
+  {
+    id: 'implant_13_3',
+    name: {
+      en: 'Neuroconnector "WPN-F70"',
+      ru: 'Нейроконнектор «WPN-F70»'
+    },
+    type: 'fixed',
+    category: 'implant',
+    rank: 13,
+    defaultStats: {
+      damage: 15
+    }
+  },
+  {
+    id: 'implant_15_1',
+    name: {
+      en: 'Neuroconnector "Gladius III"',
+      ru: 'Нейроконнектор «Gladius III»'
+    },
+    type: 'fixed',
+    category: 'implant',
+    rank: 15,
+    defaultStats: {
+      damage: 3
+    }
   }
 ];

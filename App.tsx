@@ -13,7 +13,7 @@ import { Save, FolderOpen, Trash2, Cpu, BarChart2, RefreshCcw, Globe, Check, Inf
 
 const STORAGE_KEY = 'dmg_calc_configs';
 const LANG_STORAGE_KEY = 'dmg_calc_lang';
-const APP_VERSION = '0.5.0';
+const APP_VERSION = '0.8.0';
 
 export default function App() {
   // --- State ---
@@ -477,6 +477,7 @@ export default function App() {
                           value={baseStats[key] || 0} 
                           onChange={updateBaseStat} 
                           warning={warnings[`base_${key}`]}
+                          min={key === 'number_of_cannons' ? 1 : undefined}
                         />
                     ))}
                 </div>
