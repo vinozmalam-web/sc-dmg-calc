@@ -124,6 +124,23 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
                 )}
             </div>
             </div>
+            {state.enabled && module.maxStack && module.maxStack > 1 && (
+                <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-400">{texts.count}:</span>
+                    <select
+                        className="bg-slate-800 border border-slate-600 text-slate-200 text-xs rounded px-2 py-1 focus:outline-none focus:border-indigo-500"
+                        value={state.count || 1}
+                        onChange={(e) => {
+                            const newCount = parseInt(e.target.value, 10);
+                            onChange(module.id, { ...state, count: newCount });
+                        }}
+                    >
+                        {Array.from({ length: module.maxStack }, (_, i) => i + 1).map(num => (
+                            <option key={num} value={num}>{num}</option>
+                        ))}
+                    </select>
+                </div>
+            )}
         </div>
 
         {state.enabled && (

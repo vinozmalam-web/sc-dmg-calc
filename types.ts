@@ -68,11 +68,13 @@ export interface ModuleDefinition {
   allowedDamageTypes?: DamageType[];
   defaultStats: Partial<Record<StatKey, number>>;
   rank?: number;
+  maxStack?: number;
 }
 
 export interface ModuleState {
   enabled: boolean;
   values: Partial<Record<StatKey, number>>;
+  count?: number;
 }
 
 export interface SavedConfig {

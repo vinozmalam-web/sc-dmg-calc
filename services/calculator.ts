@@ -38,9 +38,23 @@ export class DamageCalculator {
     // Helper to extract non-zero Z values for a specific key from all chips AND active modules
     const getZValues = (key: string): number[] => {
         const chipVals = chips.map(c => c[key] || 0);
-        const moduleVals = Object.values(activeModules)
-            .filter(m => m.enabled)
-            .map(m => m.values[key as StatKey] || 0);
+        const moduleVals: number[] = [];
+        
+        Object.values(activeModules).forEach(m => {
+            if (m.enabled) {
+                const val = m.values[key as StatKey] || 0;
+                if (val !== 0) {
+                    const count = m.count || 1;
+                    let multiplier = 1.0;
+                    if (count === 2) multiplier = 0.9;
+                    if (count >= 3) multiplier = 0.8;
+                    
+                    for (let i = 0; i < count; i++) {
+                        moduleVals.push(val * multiplier);
+                    }
+                }
+            }
+        });
         
         return [...chipVals, ...moduleVals].filter(v => v !== 0);
     };

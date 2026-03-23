@@ -202,7 +202,8 @@ export const UI_TEXT = {
     noModules: "No compatible modules for selected damage type.",
     implants: "Implants",
     noImplants: "No compatible implants for selected damage type.",
-    rank: "Rank"
+    rank: "Rank",
+    count: "Count"
   },
   ru: {
     appTitle: "Калькулятор урона чипов Star Conflict",
@@ -251,7 +252,8 @@ export const UI_TEXT = {
     noModules: "Нет совместимых модулей для выбранного типа урона.",
     implants: "Импланты",
     noImplants: "Нет совместимых имплантов для выбранного типа урона.",
-    rank: "Ранг"
+    rank: "Ранг",
+    count: "Количество"
   }
 };
 

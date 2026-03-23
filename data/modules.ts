@@ -357,6 +357,58 @@ export const MODULES: ModuleDefinition[] = [
       damage: -6.5
     }
   },
+  {
+    id: 'shared_cooler',
+    name: {
+      en: 'Shared Cooler',
+      ru: 'Интегрированный охладитель'
+    },
+    type: 'modifiable',
+    category: 'modifier',
+    maxStack: 3,
+    defaultStats: {
+      overheat: 38.8
+    }
+  },
+  {
+    id: 'iridium_heatsink',
+    name: {
+      en: 'Iridium Heatsink',
+      ru: 'Иридиевый теплоотвод'
+    },
+    type: 'modifiable',
+    category: 'modifier',
+    maxStack: 3,
+    defaultStats: {
+      fire_rate: 10.7
+    }
+  },
+  {
+    id: 'infrared_scanner',
+    name: {
+      en: 'Infrared Scanner',
+      ru: 'Инфракрасный сканер'
+    },
+    type: 'modifiable',
+    category: 'modifier',
+    maxStack: 3,
+    defaultStats: {
+      crit_chance: 10.5
+    }
+  },
+  {
+    id: 'target_tracking_coprocessor',
+    name: {
+      en: 'Target Tracking Coprocessor',
+      ru: 'Сопроцессор наведения'
+    },
+    type: 'modifiable',
+    category: 'modifier',
+    maxStack: 3,
+    defaultStats: {
+      crit_power: 23
+    }
+  },
 
   // --- Implants ---
   {
