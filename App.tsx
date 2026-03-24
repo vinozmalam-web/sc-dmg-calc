@@ -13,7 +13,7 @@ import { Save, FolderOpen, Trash2, Cpu, BarChart2, RefreshCcw, Globe, Check, Inf
 
 const STORAGE_KEY = 'dmg_calc_configs';
 const LANG_STORAGE_KEY = 'dmg_calc_lang';
-const APP_VERSION = '0.8.0';
+const APP_VERSION = '0.8.1';
 
 export default function App() {
   // --- State ---
