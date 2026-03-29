@@ -33,7 +33,8 @@ export class DamageCalculator {
     baseStats: Stats, 
     chips: Stats[], 
     activeModules: Record<string, ModuleState> = {},
-    selectedDamageType: DamageType = 'em'
+    selectedDamageType: DamageType = 'em',
+    isBetaEnabled: boolean = false
   ): CalculationResult {
     // Helper to extract non-zero Z values for a specific key from all chips AND active modules
     const getZValues = (key: string): number[] => {
@@ -85,7 +86,14 @@ export class DamageCalculator {
     // --- Stage 3: D3 (D2 + Aliens) ---
     const d3Z = getZValues('dmg_aliens');
     const d3Result = this.calculateFinalValue(d2, d3Z);
-    const d3 = d3Result.value;
+    let d3 = d3Result.value;
+
+    // --- Stage 3.5: Elidium Multiplier (Applies to D3 for Special Ops) ---
+    if (isBetaEnabled) {
+      const elidiumZ = getZValues('dmg_elidium');
+      const elidiumResult = this.calculateFinalValue(d3, elidiumZ);
+      d3 = elidiumResult.value;
+    }
 
     // --- Stage 4: Final Attributes (Standard Stats) ---
     const finalStats: Stats = {};
@@ -182,9 +190,10 @@ export class DamageCalculator {
     currentChips: Stats[], 
     candidateChip: Stats,
     activeModules: Record<string, ModuleState> = {},
-    selectedDamageType: DamageType = 'em'
+    selectedDamageType: DamageType = 'em',
+    isBetaEnabled: boolean = false
   ): ReplacementResult[] {
-    const baseline = this.calculate(baseStats, currentChips, activeModules, selectedDamageType);
+    const baseline = this.calculate(baseStats, currentChips, activeModules, selectedDamageType, isBetaEnabled);
     const results: ReplacementResult[] = [];
 
     const isCandidateEmpty = Object.values(candidateChip).every(v => v === 0);
@@ -194,7 +203,7 @@ export class DamageCalculator {
         const tempChips = [...currentChips];
         tempChips[i] = candidateChip;
 
-        const newRes = this.calculate(baseStats, tempChips, activeModules, selectedDamageType);
+        const newRes = this.calculate(baseStats, tempChips, activeModules, selectedDamageType, isBetaEnabled);
 
         results.push({
             replaced_index: i,

@@ -33,6 +33,10 @@ export default function App() {
   const [configName, setConfigName] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
+  
+  // Beta State
+  const [isBetaEnabled, setIsBetaEnabled] = useState(false);
+  const [isBetaPopupOpen, setIsBetaPopupOpen] = useState(false);
 
   // UI State
   const [toast, setToast] = useState<{ message: string; subMessage?: string; type: 'success' | 'info' } | null>(null);
@@ -52,6 +56,11 @@ export default function App() {
     const savedLang = localStorage.getItem(LANG_STORAGE_KEY) as Language;
     if (savedLang && (savedLang === 'en' || savedLang === 'ru')) {
         setLanguage(savedLang);
+    }
+    // Load Beta
+    const savedBeta = localStorage.getItem('dmg_calc_beta');
+    if (savedBeta === 'true') {
+        setIsBetaEnabled(true);
     }
   }, []);
 
@@ -86,8 +95,8 @@ export default function App() {
 
   // --- Calculations ---
   const result = useMemo(() => {
-    return DamageCalculator.calculate(baseStats, chips, activeModules, selectedDamageType);
-  }, [baseStats, chips, activeModules, selectedDamageType]);
+    return DamageCalculator.calculate(baseStats, chips, activeModules, selectedDamageType, isBetaEnabled);
+  }, [baseStats, chips, activeModules, selectedDamageType, isBetaEnabled]);
 
   // --- Helpers ---
   const text = UI_TEXT[language];
@@ -341,6 +350,23 @@ export default function App() {
              <span>{language === 'en' ? 'English' : 'Русский'}</span>
            </button>
 
+           <div className="flex items-center justify-between p-2 rounded bg-slate-900 border border-slate-800 text-sm font-medium text-slate-300">
+             <span>{text.betaVersion}</span>
+             <button 
+               onClick={() => {
+                 if (isBetaEnabled) {
+                   setIsBetaEnabled(false);
+                   localStorage.setItem('dmg_calc_beta', 'false');
+                 } else {
+                   setIsBetaPopupOpen(true);
+                 }
+               }}
+               className={`w-10 h-5 rounded-full relative transition-colors ${isBetaEnabled ? 'bg-blue-500' : 'bg-slate-700'}`}
+             >
+               <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform ${isBetaEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
+             </button>
+           </div>
+
            <button 
              onClick={createNewConfig}
              className="w-full flex items-center justify-center gap-2 p-2 rounded bg-emerald-600/20 border border-emerald-500/30 hover:bg-emerald-600/30 hover:border-emerald-500/50 transition-all text-sm font-medium text-emerald-400"
@@ -580,6 +606,7 @@ export default function App() {
            candidate={candidate}
            activeModules={activeModules}
            selectedDamageType={selectedDamageType}
+           isBetaEnabled={isBetaEnabled}
            labels={labels}
            texts={text}
            tooltips={chipTooltips}
@@ -590,6 +617,41 @@ export default function App() {
            onClose={() => setIsAnalysisOpen(false)}
          />
        </div>
+
+       {/* Beta Popup */}
+       {isBetaPopupOpen && (
+         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+           <div className="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-w-md w-full overflow-hidden animate-in zoom-in-95 duration-200">
+             <div className="p-6">
+               <h3 className="text-xl font-bold text-slate-100 mb-2">{text.betaPopupTitle}</h3>
+               <p className="text-slate-400 text-sm mb-4">
+                 {text.betaPopupDesc}
+               </p>
+               <ul className="text-slate-300 text-sm space-y-2 mb-6 bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
+                 <li>{text.betaPopupFeature1}</li>
+               </ul>
+               <div className="flex gap-3 justify-end">
+                 <button 
+                   onClick={() => setIsBetaPopupOpen(false)}
+                   className="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                 >
+                   {text.no}
+                 </button>
+                 <button 
+                   onClick={() => {
+                     setIsBetaEnabled(true);
+                     localStorage.setItem('dmg_calc_beta', 'true');
+                     setIsBetaPopupOpen(false);
+                   }}
+                   className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors shadow-lg shadow-blue-900/20"
+                 >
+                   {text.ok}
+                 </button>
+               </div>
+             </div>
+           </div>
+         </div>
+       )}
 
     </div>
   );

@@ -203,7 +203,13 @@ export const UI_TEXT = {
     implants: "Implants",
     noImplants: "No compatible implants for selected damage type.",
     rank: "Rank",
-    count: "Count"
+    count: "Count",
+    betaVersion: "Beta Version",
+    betaPopupTitle: "Enable Beta Features?",
+    betaPopupDesc: "Enabling beta version will activate experimental features. These features might change or be removed in the future. Current beta features:",
+    betaPopupFeature1: "- Dmg vs Elidium chip parameter affects Special Ops damage",
+    ok: "OK",
+    no: "No"
   },
   ru: {
     appTitle: "Калькулятор урона чипов Star Conflict",
@@ -253,7 +259,13 @@ export const UI_TEXT = {
     implants: "Импланты",
     noImplants: "Нет совместимых имплантов для выбранного типа урона.",
     rank: "Ранг",
-    count: "Количество"
+    count: "Количество",
+    betaVersion: "Бета-версия",
+    betaPopupTitle: "Включить бета-функции?",
+    betaPopupDesc: "Включение бета-версии активирует экспериментальные функции. Эти функции могут измениться или быть удалены в будущем. Текущие бета-функции:",
+    betaPopupFeature1: "- Параметр чипа Урон по Элидиуму влияет на урон в Спецоперациях",
+    ok: "ОК",
+    no: "Нет"
   }
 };
 
