@@ -77,6 +77,14 @@ export interface ModuleState {
   count?: number;
 }
 
+export interface SavedChip {
+  id: string;
+  level: number;
+  stats: Stats;
+  timestamp: number;
+  note?: string;
+}
+
 export interface SavedConfig {
   name: string;
   timestamp: number;
@@ -85,4 +93,6 @@ export interface SavedConfig {
   candidate: Stats;
   activeModules?: Record<string, ModuleState>;
   selectedDamageType?: DamageType;
+  level?: number;
+  isTemporary?: boolean;
 }

@@ -73,9 +73,9 @@ export const StatInput: React.FC<StatInputProps> = ({ statKey, value, label, des
 
   return (
     <div className={`flex flex-col relative ${className}`}>
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between mb-0.5">
         <div className="flex items-center gap-1.5 overflow-hidden">
-            <label className={`text-slate-400 font-medium ${compact ? 'text-xs' : 'text-sm'} truncate ${warning ? 'text-red-400' : ''}`}>
+            <label className={`text-slate-400 font-medium ${compact ? 'text-[11px]' : 'text-xs'} truncate ${warning ? 'text-red-400' : ''}`}>
                 {label}
             </label>
             {hasInfo && (
@@ -108,7 +108,7 @@ export const StatInput: React.FC<StatInputProps> = ({ statKey, value, label, des
         className={`
           bg-slate-800 border rounded text-slate-100 
           focus:ring-2 outline-none transition-all w-full
-          ${compact ? 'px-2 py-1 text-sm' : 'px-3 py-2 text-base'}
+          ${compact ? 'px-2 py-1 text-xs h-7' : 'px-2.5 py-1.5 text-sm h-8'}
           ${warning ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-slate-700 focus:ring-blue-500 focus:border-transparent'}
         `}
       />

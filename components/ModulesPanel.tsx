@@ -100,17 +100,17 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
     const isAmmo = module.category === 'ammo';
 
     return (
-        <div key={module.id} className={`p-4 rounded-lg border transition-all ${state.enabled ? 'bg-indigo-900/10 border-indigo-500/40 shadow-sm' : 'bg-slate-900/30 border-slate-700/50'}`}>
-        <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
+        <div key={module.id} className={`p-3 rounded-lg border transition-all ${state.enabled ? 'bg-indigo-900/10 border-indigo-500/40 shadow-sm' : 'bg-slate-900/30 border-slate-700/50'}`}>
+        <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
             <button 
                 onClick={() => handleToggle(module.id)}
                 className={`transition-colors ${state.enabled ? 'text-indigo-400' : 'text-slate-600 hover:text-slate-400'}`}
             >
                 {isAmmo ? (
-                    state.enabled ? <CircleDot className="w-6 h-6" /> : <Circle className="w-6 h-6" />
+                    state.enabled ? <CircleDot className="w-5 h-5" /> : <Circle className="w-5 h-5" />
                 ) : (
-                    state.enabled ? <CheckCircle2 className="w-6 h-6" /> : <Circle className="w-6 h-6" />
+                    state.enabled ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />
                 )}
             </button>
             <div>
@@ -144,7 +144,7 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
         </div>
 
         {state.enabled && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pl-9 animate-in fade-in slide-in-from-left-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pl-7 animate-in fade-in slide-in-from-left-2">
             {Object.entries(effectiveValues).map(([key, val]) => (
                 <div key={key}>
                 {module.type === 'modifiable' ? (
@@ -158,8 +158,8 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
                     />
                 ) : (
                     <div className="flex flex-col">
-                    <span className="text-xs text-slate-500 font-medium">{labels[key as StatKey]}</span>
-                    <span className="text-sm font-bold text-indigo-400">+{val}%</span>
+                    <span className="text-[11px] text-slate-500 font-medium">{labels[key as StatKey]}</span>
+                    <span className="text-xs font-bold text-indigo-400">+{val}%</span>
                     </div>
                 )}
                 </div>
@@ -194,31 +194,31 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Ammo Panel */}
       <div className="bg-slate-800/40 rounded-xl border border-slate-700/50 overflow-hidden">
         <button 
           onClick={() => setIsAmmoOpen(!isAmmoOpen)}
-          className="w-full flex items-center justify-between p-4 sm:p-6 hover:bg-slate-700/30 transition-colors"
+          className="w-full flex items-center justify-between p-2.5 sm:p-3 hover:bg-slate-700/30 transition-colors"
         >
           <div className="flex items-center gap-2">
-            <Crosshair className="w-5 h-5 text-indigo-400" />
-            <h2 className="text-lg font-bold">{texts.ammo}</h2>
-            <span className="ml-2 px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-xs rounded-full">
+            <Crosshair className="w-4 h-4 text-indigo-400" />
+            <h2 className="text-sm font-bold">{texts.ammo}</h2>
+            <span className="ml-2 px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-[10px] rounded-full">
               {ammoModules.filter(m => activeModules[m.id]?.enabled).length}
             </span>
           </div>
-          {isAmmoOpen ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+          {isAmmoOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
         </button>
 
         {isAmmoOpen && (
-          <div className="p-4 sm:p-6 pt-0 space-y-3 border-t border-slate-700/50 animate-in slide-in-from-top-2 duration-200">
+          <div className="p-2.5 sm:p-3 pt-0 space-y-2 border-t border-slate-700/50 animate-in slide-in-from-top-2 duration-200">
             {ammoModules.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {ammoModules.map(renderModuleItem)}
               </div>
             ) : (
-              <div className="text-slate-500 text-center italic text-sm py-4">
+              <div className="text-slate-500 text-center italic text-sm py-3">
                 {texts.noAmmo}
               </div>
             )}
@@ -230,26 +230,26 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
       <div className="bg-slate-800/40 rounded-xl border border-slate-700/50 overflow-hidden">
         <button 
           onClick={() => setIsModifiersOpen(!isModifiersOpen)}
-          className="w-full flex items-center justify-between p-4 sm:p-6 hover:bg-slate-700/30 transition-colors"
+          className="w-full flex items-center justify-between p-2.5 sm:p-3 hover:bg-slate-700/30 transition-colors"
         >
           <div className="flex items-center gap-2">
-            <Layers className="w-5 h-5 text-indigo-400" />
-            <h2 className="text-lg font-bold">{texts.shipModifiers}</h2>
-            <span className="ml-2 px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-xs rounded-full">
+            <Layers className="w-4 h-4 text-indigo-400" />
+            <h2 className="text-sm font-bold">{texts.shipModifiers}</h2>
+            <span className="ml-2 px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-[10px] rounded-full">
               {modifierModules.filter(m => activeModules[m.id]?.enabled).length}
             </span>
           </div>
-          {isModifiersOpen ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+          {isModifiersOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
         </button>
 
         {isModifiersOpen && (
-          <div className="p-4 sm:p-6 pt-0 space-y-3 border-t border-slate-700/50 animate-in slide-in-from-top-2 duration-200">
+          <div className="p-2.5 sm:p-3 pt-0 space-y-2 border-t border-slate-700/50 animate-in slide-in-from-top-2 duration-200">
             {modifierModules.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {modifierModules.map(renderModuleItem)}
               </div>
             ) : (
-              <div className="text-slate-500 text-center italic text-sm py-4">
+              <div className="text-slate-500 text-center italic text-sm py-3">
                 {texts.noModules}
               </div>
             )}
@@ -261,34 +261,34 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
       <div className="bg-slate-800/40 rounded-xl border border-slate-700/50 overflow-hidden">
         <button 
           onClick={() => setIsImplantsOpen(!isImplantsOpen)}
-          className="w-full flex items-center justify-between p-4 sm:p-6 hover:bg-slate-700/30 transition-colors"
+          className="w-full flex items-center justify-between p-2.5 sm:p-3 hover:bg-slate-700/30 transition-colors"
         >
           <div className="flex items-center gap-2">
-            <Cpu className="w-5 h-5 text-indigo-400" />
-            <h2 className="text-lg font-bold">{texts.implants}</h2>
-            <span className="ml-2 px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-xs rounded-full">
+            <Cpu className="w-4 h-4 text-indigo-400" />
+            <h2 className="text-sm font-bold">{texts.implants}</h2>
+            <span className="ml-2 px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-[10px] rounded-full">
               {implantModules.filter(m => activeModules[m.id]?.enabled).length}
             </span>
           </div>
-          {isImplantsOpen ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+          {isImplantsOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
         </button>
 
         {isImplantsOpen && (
-          <div className="p-4 sm:p-6 pt-0 space-y-4 border-t border-slate-700/50 animate-in slide-in-from-top-2 duration-200">
+          <div className="p-2.5 sm:p-3 pt-0 space-y-3 border-t border-slate-700/50 animate-in slide-in-from-top-2 duration-200">
             {sortedRanks.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {sortedRanks.map(rank => {
                   const implants = implantsByRank[rank];
                   const activeImplant = implants.find(m => activeModules[m.id]?.enabled);
                   
                   return (
-                    <div key={rank} className="p-4 rounded-lg border bg-slate-900/30 border-slate-700/50">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                    <div key={rank} className="p-3 rounded-lg border bg-slate-900/30 border-slate-700/50">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
                         <span className="text-sm font-bold text-slate-300 min-w-[80px]">
                           {texts.rank} {rank}
                         </span>
                         <select
-                          className="flex-1 bg-slate-800 border border-slate-600 text-slate-200 text-sm rounded-md px-3 py-2 focus:outline-none focus:border-indigo-500"
+                          className="flex-1 bg-slate-800 border border-slate-600 text-slate-200 text-xs rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-500"
                           value={activeImplant ? activeImplant.id : ""}
                           onChange={(e) => handleImplantSelect(rank, e.target.value)}
                         >
@@ -302,11 +302,11 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
                       </div>
                       
                       {activeImplant && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pl-0 sm:pl-[92px] animate-in fade-in slide-in-from-left-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pl-0 sm:pl-[88px] animate-in fade-in slide-in-from-left-2">
                           {Object.entries(activeImplant.defaultStats).map(([key, val]) => (
                             <div key={key} className="flex flex-col">
-                              <span className="text-xs text-slate-500 font-medium">{labels[key as StatKey]}</span>
-                              <span className="text-sm font-bold text-indigo-400">+{val}%</span>
+                              <span className="text-[11px] text-slate-500 font-medium">{labels[key as StatKey]}</span>
+                              <span className="text-xs font-bold text-indigo-400">+{val}%</span>
                             </div>
                           ))}
                         </div>
@@ -316,7 +316,7 @@ export const ModulesPanel: React.FC<ModulesPanelProps> = ({
                 })}
               </div>
             ) : (
-              <div className="text-slate-500 text-center italic text-sm py-4">
+              <div className="text-slate-500 text-center italic text-sm py-3">
                 {texts.noImplants}
               </div>
             )}

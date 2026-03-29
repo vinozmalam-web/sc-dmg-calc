@@ -9,7 +9,12 @@ import { StatInput } from './components/StatInput';
 import { ResultsPanel } from './components/ResultsPanel';
 import { AnalysisPanel } from './components/AnalysisPanel';
 import { ModulesPanel } from './components/ModulesPanel';
-import { Save, FolderOpen, Trash2, Cpu, BarChart2, RefreshCcw, Globe, Check, Info, X, Plus, Download, Upload } from 'lucide-react';
+import { Save, FolderOpen, Trash2, Cpu, BarChart2, RefreshCcw, Globe, Check, Info, X, Plus, Download, Upload, Zap } from 'lucide-react';
+
+import { GlobalAnalysis } from './components/GlobalAnalysis';
+import { ChipInventory } from './components/ChipInventory';
+import { AutoBuilderModal } from './components/AutoBuilderModal';
+import { SavedChip } from './types';
 
 const STORAGE_KEY = 'dmg_calc_configs';
 const LANG_STORAGE_KEY = 'dmg_calc_lang';
@@ -24,15 +29,19 @@ export default function App() {
   const [selectedDamageType, setSelectedDamageType] = useState<DamageType>('em');
   const [activeChipTab, setActiveChipTab] = useState(0);
   const [warnings, setWarnings] = useState<Record<string, string>>({});
+  const [shipRank, setShipRank] = useState(15);
+  const [isTemporary, setIsTemporary] = useState(false);
   
   // Language State
   const [language, setLanguage] = useState<Language>('en');
   
   // Storage State
   const [savedConfigs, setSavedConfigs] = useState<SavedConfig[]>([]);
+  const [savedChips, setSavedChips] = useState<SavedChip[]>([]);
   const [configName, setConfigName] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
+  const [isAutoBuilderOpen, setIsAutoBuilderOpen] = useState(false);
   
   // Beta State
   const [isBetaEnabled, setIsBetaEnabled] = useState(false);
@@ -40,6 +49,8 @@ export default function App() {
 
   // UI State
   const [toast, setToast] = useState<{ message: string; subMessage?: string; type: 'success' | 'info' } | null>(null);
+  const [activeMainTab, setActiveMainTab] = useState<'editor' | 'global_analysis' | 'inventory'>('editor');
+  const [candidateRank, setCandidateRank] = useState(15);
 
   // --- Effects ---
   useEffect(() => {
@@ -50,6 +61,15 @@ export default function App() {
         setSavedConfigs(JSON.parse(loaded));
       } catch (e) {
         console.error("Failed to load configs", e);
+      }
+    }
+    // Load Chips
+    const loadedChips = localStorage.getItem('dmg_calc_chips');
+    if (loadedChips) {
+      try {
+        setSavedChips(JSON.parse(loadedChips));
+      } catch (e) {
+        console.error("Failed to load chips", e);
       }
     }
     // Load Language
@@ -184,7 +204,9 @@ export default function App() {
       chips,
       candidate,
       activeModules,
-      selectedDamageType
+      selectedDamageType,
+      level: shipRank,
+      isTemporary
     };
     
     const newConfigs = [...savedConfigs.filter(c => c.name !== configName), newConfig];
@@ -239,6 +261,8 @@ export default function App() {
     // Default to 'em' if undefined (legacy configs)
     setSelectedDamageType(config.selectedDamageType || 'em');
     setConfigName(config.name);
+    setShipRank(config.level || 15);
+    setIsTemporary(config.isTemporary || false);
     
     // Merge new build warnings with preserved candidate warnings
     setWarnings({ ...candidateWarnings, ...newWarnings });
@@ -262,9 +286,24 @@ export default function App() {
     setActiveModules({});
     setSelectedDamageType('em');
     setConfigName("");
+    setShipRank(15);
+    setIsTemporary(false);
     setWarnings({});
     setIsSidebarOpen(false);
     showToast(text.newConfigCreated, '', 'info');
+  };
+
+  const saveChipToInventory = (chip: Stats, rank: number) => {
+    const newChip: SavedChip = {
+      id: crypto.randomUUID(),
+      level: rank,
+      stats: { ...chip },
+      timestamp: Date.now()
+    };
+    const newChips = [...savedChips, newChip];
+    setSavedChips(newChips);
+    localStorage.setItem('dmg_calc_chips', JSON.stringify(newChips));
+    showToast(text.saveAlert, '', 'success');
   };
 
   const exportBackup = () => {
@@ -304,6 +343,44 @@ export default function App() {
               localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedConfigs));
               return mergedConfigs;
             });
+
+            // Extract chips from imported configs
+            setSavedChips(prev => {
+              const newChipsToAdd: SavedChip[] = [];
+              parsed.forEach((config: any) => {
+                if (config.chips && Array.isArray(config.chips)) {
+                  config.chips.forEach((chip: any) => {
+                    // Check if chip is not empty (has any non-zero stat)
+                    const isNotEmpty = Object.values(chip).some(val => val !== 0);
+                    if (isNotEmpty) {
+                      newChipsToAdd.push({
+                        id: crypto.randomUUID(),
+                        level: config.level || 15,
+                        stats: { ...chip },
+                        timestamp: Date.now(),
+                        note: `Imported from ${config.name || 'backup'}`
+                      });
+                    }
+                  });
+                }
+              });
+
+              // Filter out exact duplicates
+              const uniqueNewChips = newChipsToAdd.filter(newChip => {
+                return !prev.some(existingChip => {
+                  const keys = Object.keys(newChip.stats) as (keyof Stats)[];
+                  return existingChip.level === newChip.level && keys.every(k => existingChip.stats[k] === newChip.stats[k]);
+                });
+              });
+
+              if (uniqueNewChips.length > 0) {
+                const mergedChips = [...prev, ...uniqueNewChips];
+                localStorage.setItem('dmg_calc_chips', JSON.stringify(mergedChips));
+                return mergedChips;
+              }
+              return prev;
+            });
+
             showToast(text.importSuccess, '', 'success');
           } else {
             throw new Error("Invalid format");
@@ -336,21 +413,21 @@ export default function App() {
 
       {/* --- Sidebar (Storage) --- */}
       <div className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-80 md:w-64 bg-slate-950 border-r border-slate-800 transition-transform duration-300 fixed md:static z-50 h-full flex flex-col shrink-0 shadow-2xl md:shadow-none`}>
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-blue-500 tracking-tight">{text.appTitle}</h1>
+        <div className="p-3 border-b border-slate-800 flex items-center justify-between">
+          <h1 className="text-lg font-bold text-blue-500 tracking-tight">{text.appTitle}</h1>
           <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-slate-400 hover:text-white">✕</button>
         </div>
         
-        <div className="p-4 space-y-4 flex-1 overflow-y-auto">
+        <div className="p-3 space-y-3 flex-1 overflow-y-auto">
            <button 
              onClick={toggleLanguage}
-             className="w-full flex items-center justify-center gap-2 p-2 rounded bg-slate-900 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-800 transition-all text-sm font-medium text-slate-300"
+             className="w-full flex items-center justify-center gap-2 p-1.5 rounded bg-slate-900 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-800 transition-all text-xs font-medium text-slate-300"
            >
-             <Globe className="w-4 h-4" />
+             <Globe className="w-3.5 h-3.5" />
              <span>{language === 'en' ? 'English' : 'Русский'}</span>
            </button>
 
-           <div className="flex items-center justify-between p-2 rounded bg-slate-900 border border-slate-800 text-sm font-medium text-slate-300">
+           <div className="flex items-center justify-between p-1.5 rounded bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300">
              <span>{text.betaVersion}</span>
              <button 
                onClick={() => {
@@ -361,15 +438,15 @@ export default function App() {
                    setIsBetaPopupOpen(true);
                  }
                }}
-               className={`w-10 h-5 rounded-full relative transition-colors ${isBetaEnabled ? 'bg-blue-500' : 'bg-slate-700'}`}
+               className={`w-8 h-4 rounded-full relative transition-colors ${isBetaEnabled ? 'bg-blue-500' : 'bg-slate-700'}`}
              >
-               <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform ${isBetaEnabled ? 'translate-x-5' : 'translate-x-1'}`} />
+               <div className={`w-3 h-3 rounded-full bg-white absolute top-0.5 transition-transform ${isBetaEnabled ? 'translate-x-4' : 'translate-x-0.5'}`} />
              </button>
            </div>
 
            <button 
              onClick={createNewConfig}
-             className="w-full flex items-center justify-center gap-2 p-2 rounded bg-emerald-600/20 border border-emerald-500/30 hover:bg-emerald-600/30 hover:border-emerald-500/50 transition-all text-sm font-medium text-emerald-400"
+             className="w-full flex items-center justify-center gap-2 p-1.5 rounded bg-emerald-600/20 border border-emerald-500/30 hover:bg-emerald-600/30 hover:border-emerald-500/50 transition-all text-xs font-medium text-emerald-400"
            >
              <Plus className="w-4 h-4" />
              <span>{text.newConfig}</span>
@@ -432,31 +509,67 @@ export default function App() {
       </div>
 
       <div className="flex-1 flex flex-col min-w-0 bg-slate-900/50 relative">
-        <div className="lg:hidden bg-slate-950 p-4 border-b border-slate-800 flex items-center justify-between shrink-0 z-10 shadow-md">
+        <div className="lg:hidden bg-slate-950 p-3 border-b border-slate-800 flex items-center justify-between shrink-0 z-10 shadow-md">
           <div className="w-10">
             <button onClick={() => setIsSidebarOpen(true)} className="md:hidden text-slate-300 hover:text-white transition-colors">
-               <FolderOpen className="w-6 h-6" />
+               <FolderOpen className="w-5 h-5" />
             </button>
           </div>
-          <span className="font-bold text-lg tracking-tight text-slate-100 truncate mx-2">{text.appTitle}</span>
+          <span className="font-bold text-base tracking-tight text-slate-100 truncate mx-2">{text.appTitle}</span>
           <div className="w-10 flex justify-end">
             <button 
               onClick={() => setIsAnalysisOpen(true)} 
               className={`text-slate-300 hover:text-white transition-colors ${isAnalysisOpen ? 'text-blue-400' : ''}`}
             >
-               <RefreshCcw className="w-6 h-6" />
+               <RefreshCcw className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 space-y-8">
-            <div className="bg-slate-800/40 rounded-xl p-4 sm:p-6 border border-slate-700/50">
-                <div className="flex items-center gap-2 mb-4">
-                  <BarChart2 className="w-5 h-5 text-blue-400" />
-                  <h2 className="text-lg font-bold">{text.baseStats}</h2>
-                </div>
+        {/* Main Tabs */}
+        <div className="flex border-b border-slate-800 bg-slate-950/50 px-3 pt-1.5">
+            <button
+                onClick={() => setActiveMainTab('editor')}
+                className={`px-4 py-2 text-xs font-medium transition-colors border-b-2 whitespace-nowrap ${
+                    activeMainTab === 'editor'
+                    ? 'border-blue-500 text-blue-400 bg-slate-900/50'
+                    : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/30'
+                }`}
+            >
+                {text.shipEditor}
+            </button>
+            <button
+                onClick={() => setActiveMainTab('global_analysis')}
+                className={`px-4 py-2 text-xs font-medium transition-colors border-b-2 whitespace-nowrap ${
+                    activeMainTab === 'global_analysis'
+                    ? 'border-blue-500 text-blue-400 bg-slate-900/50'
+                    : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/30'
+                }`}
+            >
+                {text.globalAnalysis}
+            </button>
+            <button
+                onClick={() => setActiveMainTab('inventory')}
+                className={`px-4 py-2 text-xs font-medium transition-colors border-b-2 whitespace-nowrap ${
+                    activeMainTab === 'inventory'
+                    ? 'border-blue-500 text-blue-400 bg-slate-900/50'
+                    : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/30'
+                }`}
+            >
+                {text.chipInventory}
+            </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-2 md:p-3 space-y-3">
+            {activeMainTab === 'editor' ? (
+                <>
+                    <div className="bg-slate-800/40 rounded-xl p-2 sm:p-3 border border-slate-700/50">
+                        <div className="flex items-center gap-2 mb-2">
+                          <BarChart2 className="w-4 h-4 text-blue-400" />
+                          <h2 className="text-sm font-bold">{text.baseStats}</h2>
+                        </div>
                 {/* Updated Grid for Base Stats + Damage Type Selector */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-3">
                     
                     {/* 1. Damage Input */}
                     <StatInput 
@@ -471,24 +584,24 @@ export default function App() {
 
                     {/* 2. Damage Type Selector */}
                     <div className="flex flex-col relative">
-                        <label className="text-slate-400 font-medium text-sm truncate mb-1">
+                        <label className="text-slate-400 font-medium text-xs truncate mb-0.5">
                             {text.damageType}
                         </label>
-                        <div className="bg-slate-800 border border-slate-700 rounded text-slate-100 px-3 py-2 h-[42px] flex items-center justify-center gap-4">
+                        <div className="bg-slate-800 border border-slate-700 rounded text-slate-100 px-2 py-1.5 h-8 flex items-center justify-center gap-3">
                              <button 
                                onClick={() => setSelectedDamageType('em')}
                                title={damageTypeTooltips.em}
-                               className={`w-6 h-6 rounded-full bg-blue-500 transition-all shadow-sm ${selectedDamageType === 'em' ? 'ring-2 ring-white scale-110 opacity-100' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
+                               className={`w-5 h-5 rounded-full bg-blue-500 transition-all shadow-sm ${selectedDamageType === 'em' ? 'ring-2 ring-white scale-110 opacity-100' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
                              />
                              <button 
                                onClick={() => setSelectedDamageType('thermal')}
                                title={damageTypeTooltips.thermal}
-                               className={`w-6 h-6 rounded-full bg-red-500 transition-all shadow-sm ${selectedDamageType === 'thermal' ? 'ring-2 ring-white scale-110 opacity-100' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
+                               className={`w-5 h-5 rounded-full bg-red-500 transition-all shadow-sm ${selectedDamageType === 'thermal' ? 'ring-2 ring-white scale-110 opacity-100' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
                              />
                              <button 
                                onClick={() => setSelectedDamageType('kinetic')}
                                title={damageTypeTooltips.kinetic}
-                               className={`w-6 h-6 rounded-full bg-yellow-400 transition-all shadow-sm ${selectedDamageType === 'kinetic' ? 'ring-2 ring-white scale-110 opacity-100' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
+                               className={`w-5 h-5 rounded-full bg-yellow-400 transition-all shadow-sm ${selectedDamageType === 'kinetic' ? 'ring-2 ring-white scale-110 opacity-100' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
                              />
                         </div>
                     </div>
@@ -506,23 +619,64 @@ export default function App() {
                           min={key === 'number_of_cannons' ? 1 : undefined}
                         />
                     ))}
+
+                    {/* Ship Rank */}
+                    <div className="flex flex-col relative">
+                        <label className="text-slate-400 font-medium text-xs truncate mb-0.5" title={text.shipRank}>
+                            {text.shipRank}
+                        </label>
+                        <input
+                            type="number"
+                            min="1"
+                            max="17"
+                            value={shipRank}
+                            onChange={(e) => setShipRank(Math.max(1, Math.min(17, Number(e.target.value))))}
+                            className={`w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-sm text-slate-100 focus:border-blue-500 outline-none transition-colors h-8`}
+                        />
+                    </div>
+
+                    {/* Temporary Build Toggle */}
+                    <div className="flex flex-col relative justify-end h-full">
+                         <label className="flex items-center gap-2 cursor-pointer group h-8">
+                            <div className="relative flex items-center">
+                                <input 
+                                    type="checkbox" 
+                                    className="sr-only" 
+                                    checked={isTemporary}
+                                    onChange={(e) => setIsTemporary(e.target.checked)}
+                                />
+                                <div className={`block w-8 h-5 rounded-full transition-colors ${isTemporary ? 'bg-blue-500' : 'bg-slate-700'}`}></div>
+                                <div className={`dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform ${isTemporary ? 'translate-x-3' : ''}`}></div>
+                            </div>
+                            <span className="text-xs font-medium text-slate-400 group-hover:text-slate-300 transition-colors">
+                                {text.temporaryBuild}
+                            </span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
-            <div className="bg-slate-800/40 rounded-xl p-4 sm:p-6 border border-slate-700/50">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-slate-800/40 rounded-xl p-2 sm:p-3 border border-slate-700/50">
+              <div className="flex items-center justify-between mb-2">
                  <div className="flex items-center gap-2">
-                    <Cpu className="w-5 h-5 text-orange-400" />
-                    <h2 className="text-lg font-bold">{text.chipsConfig}</h2>
+                    <Cpu className="w-4 h-4 text-orange-400" />
+                    <h2 className="text-sm font-bold">{text.chipsConfig}</h2>
                  </div>
+                 <button
+                   onClick={() => setIsAutoBuilderOpen(true)}
+                   className="flex items-center gap-2 px-2 py-1 bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 hover:text-blue-300 border border-blue-500/30 rounded text-[11px] font-medium transition-colors"
+                 >
+                   <Zap className="w-3 h-3" />
+                   {text.autoBuilder}
+                 </button>
               </div>
 
-              <div className="flex border-b border-slate-700 mb-6 overflow-x-auto pb-1 scrollbar-none">
+              <div className="flex border-b border-slate-700 mb-3 overflow-x-auto pb-1 scrollbar-none">
                 {[0, 1, 2, 3, 4].map(idx => (
                   <button
                     key={idx}
                     onClick={() => setActiveChipTab(idx)}
-                    className={`px-4 sm:px-6 py-2 sm:py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[11px] font-medium transition-colors border-b-2 whitespace-nowrap ${
                       activeChipTab === idx 
                       ? 'border-blue-500 text-blue-400 bg-slate-800/50' 
                       : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
@@ -533,7 +687,7 @@ export default function App() {
                 ))}
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 animate-in fade-in duration-300">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 animate-in fade-in duration-300">
                   {CHIP_STATS_KEYS.map(key => (
                     <StatInput
                       key={key}
@@ -567,6 +721,33 @@ export default function App() {
             />
 
             <ResultsPanel result={result} labels={labels} texts={text} />
+            </>
+            ) : activeMainTab === 'global_analysis' ? (
+                <GlobalAnalysis
+                    savedConfigs={savedConfigs}
+                    candidate={candidate}
+                    candidateRank={candidateRank}
+                    isBetaEnabled={isBetaEnabled}
+                    texts={text}
+                    labels={labels}
+                />
+            ) : (
+                <ChipInventory
+                    savedChips={savedChips}
+                    onDeleteChip={(id) => {
+                        const newChips = savedChips.filter(c => c.id !== id);
+                        setSavedChips(newChips);
+                        localStorage.setItem('dmg_calc_chips', JSON.stringify(newChips));
+                    }}
+                    onUpdateChip={(id, updatedChip) => {
+                        const newChips = savedChips.map(c => c.id === id ? updatedChip : c);
+                        setSavedChips(newChips);
+                        localStorage.setItem('dmg_calc_chips', JSON.stringify(newChips));
+                    }}
+                    texts={text}
+                    labels={labels}
+                />
+            )}
             
             <div className="w-full flex justify-center mt-8 pb-4">
                 <span className="text-xs font-mono text-slate-600 select-none">v{APP_VERSION}</span>
@@ -577,16 +758,16 @@ export default function App() {
              {/* Toast Notification */}
             {toast && (
               <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-bottom-5 fade-in duration-300">
-                <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-700 text-slate-200 px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px]">
-                  <div className={`p-2 rounded-full flex-shrink-0 ${toast.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'}`}>
-                    {toast.type === 'success' ? <Check className="w-5 h-5" /> : <Info className="w-5 h-5" />}
+                <div className="bg-slate-800/90 backdrop-blur-sm border border-slate-700 text-slate-200 px-3 py-2 rounded-lg shadow-2xl flex items-center gap-2 min-w-[250px]">
+                  <div className={`p-1.5 rounded-full flex-shrink-0 ${toast.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                    {toast.type === 'success' ? <Check className="w-4 h-4" /> : <Info className="w-4 h-4" />}
                   </div>
                   <div className="flex-1">
-                    <div className="font-semibold text-sm">{toast.message}</div>
-                    {toast.subMessage && <div className="text-xs text-slate-400 mt-0.5">{toast.subMessage}</div>}
+                    <div className="font-semibold text-xs">{toast.message}</div>
+                    {toast.subMessage && <div className="text-[11px] text-slate-400 mt-0.5">{toast.subMessage}</div>}
                   </div>
                   <button onClick={() => setToast(null)} className="text-slate-500 hover:text-white p-1 rounded-md hover:bg-slate-700/50 transition-colors">
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -604,6 +785,7 @@ export default function App() {
            baseStats={baseStats}
            chips={chips}
            candidate={candidate}
+           candidateRank={candidateRank}
            activeModules={activeModules}
            selectedDamageType={selectedDamageType}
            isBetaEnabled={isBetaEnabled}
@@ -612,8 +794,10 @@ export default function App() {
            tooltips={chipTooltips}
            warnings={warnings}
            onCandidateChange={updateCandidate}
+           onCandidateRankChange={setCandidateRank}
            onApplyReplacement={applyReplacement}
            onResetCandidate={() => setCandidate(DEFAULT_CHIP_STATS)}
+           onSaveToInventory={() => saveChipToInventory(candidate, candidateRank)}
            onClose={() => setIsAnalysisOpen(false)}
          />
        </div>
@@ -622,18 +806,18 @@ export default function App() {
        {isBetaPopupOpen && (
          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
            <div className="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-w-md w-full overflow-hidden animate-in zoom-in-95 duration-200">
-             <div className="p-6">
-               <h3 className="text-xl font-bold text-slate-100 mb-2">{text.betaPopupTitle}</h3>
-               <p className="text-slate-400 text-sm mb-4">
+             <div className="p-4">
+               <h3 className="text-lg font-bold text-slate-100 mb-2">{text.betaPopupTitle}</h3>
+               <p className="text-slate-400 text-xs mb-3">
                  {text.betaPopupDesc}
                </p>
-               <ul className="text-slate-300 text-sm space-y-2 mb-6 bg-slate-800/50 p-3 rounded-lg border border-slate-700/50">
+               <ul className="text-slate-300 text-xs space-y-1.5 mb-4 bg-slate-800/50 p-2.5 rounded-lg border border-slate-700/50">
                  <li>{text.betaPopupFeature1}</li>
                </ul>
-               <div className="flex gap-3 justify-end">
+               <div className="flex gap-2 justify-end">
                  <button 
                    onClick={() => setIsBetaPopupOpen(false)}
-                   className="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                   className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
                  >
                    {text.no}
                  </button>
@@ -643,7 +827,7 @@ export default function App() {
                      localStorage.setItem('dmg_calc_beta', 'true');
                      setIsBetaPopupOpen(false);
                    }}
-                   className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors shadow-lg shadow-blue-900/20"
+                   className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors shadow-lg shadow-blue-900/20"
                  >
                    {text.ok}
                  </button>
@@ -652,6 +836,23 @@ export default function App() {
            </div>
          </div>
        )}
+
+       <AutoBuilderModal
+         isOpen={isAutoBuilderOpen}
+         onClose={() => setIsAutoBuilderOpen(false)}
+         savedChips={savedChips}
+         savedConfigs={savedConfigs}
+         baseStats={baseStats}
+         activeModules={activeModules}
+         selectedDamageType={selectedDamageType}
+         shipRank={shipRank}
+         isBetaEnabled={isBetaEnabled}
+         texts={text}
+         onApplyBuild={(newChips) => {
+           setChips(newChips);
+           showToast(text.autoBuildApplied, text.chipsUpdated, "success");
+         }}
+       />
 
     </div>
   );
