@@ -127,7 +127,7 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            {CHIP_STATS_KEYS.map(key => (
+            {CHIP_STATS_KEYS.filter(key => key !== 'level').map(key => (
               <StatInput
                 key={key}
                 statKey={key}

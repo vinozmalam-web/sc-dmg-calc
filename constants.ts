@@ -22,6 +22,7 @@ export const CHIP_STATS_KEYS: StatKey[] = [
   "dmg_destroyers",
   "dmg_aliens",
   "dmg_elidium",
+  "level",
   "fire_rate",
   "range",
   "crit_chance",
@@ -46,7 +47,8 @@ export const LABELS: Record<Language, Record<StatKey, string>> = {
     dmg_kinetic: "Kinetic Damage",
     dmg_destroyers: "Dmg vs Destroyers",
     dmg_aliens: "Dmg vs Aliens",
-    dmg_elidium: "Dmg vs Elidium"
+    dmg_elidium: "Dmg vs Elidium",
+    level: "Chip Level"
   },
   ru: {
     number_of_cannons: "Количество орудий",
@@ -63,7 +65,8 @@ export const LABELS: Record<Language, Record<StatKey, string>> = {
     dmg_kinetic: "Кинет. урон",
     dmg_destroyers: "Урон эсминцам",
     dmg_aliens: "Урон пришельцам",
-    dmg_elidium: "Урон Элидиуму"
+    dmg_elidium: "Урон Элидиуму",
+    level: "Уровень чипа"
   }
 };
 
@@ -83,7 +86,8 @@ export const BASE_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     dmg_kinetic: "",
     dmg_destroyers: "",
     dmg_aliens: "",
-    dmg_elidium: ""
+    dmg_elidium: "",
+    level: ""
   },
   ru: {
     number_of_cannons: "Количество орудий, установленных на корабле.",
@@ -100,7 +104,8 @@ export const BASE_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     dmg_kinetic: "",
     dmg_destroyers: "",
     dmg_aliens: "",
-    dmg_elidium: ""
+    dmg_elidium: "",
+    level: ""
   }
 };
 
@@ -120,7 +125,8 @@ export const CHIP_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     dmg_kinetic: "Bonus damage (%) specifically for Kinetic weapons.",
     dmg_destroyers: "Percentage damage bonus against Destroyer class ships.",
     dmg_aliens: "Percentage damage bonus against Alien faction ships.",
-    dmg_elidium: "Percentage damage bonus against Elidium faction ships/structures."
+    dmg_elidium: "Percentage damage bonus against Elidium faction ships/structures.",
+    level: "The rank/level of the chip (1-17)."
   },
   ru: {
     number_of_cannons: "",
@@ -137,7 +143,8 @@ export const CHIP_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     dmg_kinetic: "Бонус к урону (%) только для кинетических орудий.",
     dmg_destroyers: "Бонус к урону (%) по кораблям класса Эсминец.",
     dmg_aliens: "Бонус к урону (%) по кораблям фракции Чужих.",
-    dmg_elidium: "Бонус к урону (%) по кораблям фракции Элидиум."
+    dmg_elidium: "Бонус к урону (%) по кораблям фракции Элидиум.",
+    level: "Уровень чипа (1-17)."
   }
 };
 
@@ -233,7 +240,8 @@ export const UI_TEXT = {
     autoBuildApplied: "Auto-Build Applied",
     chipsUpdated: "Chips have been updated.",
     noChipsSaved: "No chips saved yet.",
-    saveChipsHint: "Save chips from the Analysis panel to build your inventory."
+    saveChipsHint: "Save chips from the Analysis panel to build your inventory.",
+    previewChanges: "Preview Changes"
   },
   ru: {
     appTitle: "Калькулятор урона чипов Star Conflict",
@@ -313,7 +321,8 @@ export const UI_TEXT = {
     autoBuildApplied: "Авто-сборка применена",
     chipsUpdated: "Чипы были обновлены.",
     noChipsSaved: "Пока нет сохраненных чипов.",
-    saveChipsHint: "Сохраняйте чипы из панели сравнения, чтобы собрать инвентарь."
+    saveChipsHint: "Сохраняйте чипы из панели сравнения, чтобы собрать инвентарь.",
+    previewChanges: "Предварительный просмотр"
   }
 };
 
@@ -332,7 +341,8 @@ export const DEFAULT_BASE_STATS: Record<StatKey, number> = {
   dmg_kinetic: 0,
   dmg_destroyers: 0,
   dmg_aliens: 0,
-  dmg_elidium: 0
+  dmg_elidium: 0,
+  level: 15
 };
 
 export const DEFAULT_CHIP_STATS: Record<StatKey, number> = {

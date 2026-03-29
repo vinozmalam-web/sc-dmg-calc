@@ -45,10 +45,10 @@ export const ChipEditorModal: React.FC<ChipEditorModalProps> = ({
   };
 
   const handleLevelChange = (value: string) => {
-    const numValue = parseInt(value, 10) || 1;
+    const numValue = Math.max(1, Math.min(17, parseInt(value, 10) || 1));
     setEditedChip(prev => {
       if (!prev) return prev;
-      return { ...prev, level: numValue };
+      return { ...prev, level: numValue, stats: { ...prev.stats, level: numValue } };
     });
   };
 
@@ -107,7 +107,7 @@ export const ChipEditorModal: React.FC<ChipEditorModalProps> = ({
           <div>
             <h4 className="text-sm font-bold text-slate-300 mb-2 border-b border-slate-800 pb-1.5">Stats</h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {CHIP_STATS_KEYS.map((key) => (
+              {CHIP_STATS_KEYS.filter(key => key !== 'level').map((key) => (
                 <div key={key}>
                   <label className="block text-[11px] font-medium text-slate-500 mb-0.5 truncate" title={labels[key]}>
                     {labels[key]}

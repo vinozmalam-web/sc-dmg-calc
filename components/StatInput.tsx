@@ -14,6 +14,7 @@ interface StatInputProps {
   headerRight?: React.ReactNode;
   warning?: string;
   min?: number;
+  max?: number;
 }
 
 const TooltipPortal = ({ content, targetRect, visible, isWarning }: { content: string, targetRect: DOMRect | null, visible: boolean, isWarning?: boolean }) => {
@@ -42,7 +43,7 @@ const TooltipPortal = ({ content, targetRect, visible, isWarning }: { content: s
     );
 };
 
-export const StatInput: React.FC<StatInputProps> = ({ statKey, value, label, description, onChange, className = "", compact = false, headerRight, warning, min }) => {
+export const StatInput: React.FC<StatInputProps> = ({ statKey, value, label, description, onChange, className = "", compact = false, headerRight, warning, min, max }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const iconRef = useRef<HTMLDivElement>(null);
   const [rect, setRect] = useState<DOMRect | null>(null);
@@ -103,6 +104,7 @@ export const StatInput: React.FC<StatInputProps> = ({ statKey, value, label, des
         value={value || ''}
         placeholder="0"
         min={min}
+        max={max}
         onChange={handleChange}
         onBlur={handleBlur}
         className={`

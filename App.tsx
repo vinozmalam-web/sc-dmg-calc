@@ -23,13 +23,16 @@ const APP_VERSION = '0.8.1';
 export default function App() {
   // --- State ---
   const [baseStats, setBaseStats] = useState<Stats>(DEFAULT_BASE_STATS);
-  const [chips, setChips] = useState<Stats[]>(Array(5).fill(DEFAULT_CHIP_STATS));
-  const [candidate, setCandidate] = useState<Stats>(DEFAULT_CHIP_STATS);
+  const [chips, setChips] = useState<Stats[]>(() => Array.from({ length: 5 }, () => ({ ...DEFAULT_CHIP_STATS })));
+  const [candidate, setCandidate] = useState<Stats>({ ...DEFAULT_CHIP_STATS });
   const [activeModules, setActiveModules] = useState<Record<string, ModuleState>>({});
   const [selectedDamageType, setSelectedDamageType] = useState<DamageType>('em');
   const [activeChipTab, setActiveChipTab] = useState(0);
   const [warnings, setWarnings] = useState<Record<string, string>>({});
-  const [shipRank, setShipRank] = useState(15);
+  const [shipRank, setShipRank] = useState(() => {
+    const saved = localStorage.getItem('dmg_calc_ship_rank');
+    return saved ? parseInt(saved, 10) : 15;
+  });
   const [isTemporary, setIsTemporary] = useState(false);
   
   // Language State
@@ -141,9 +144,13 @@ export default function App() {
   };
 
   const updateChipStat = (chipIndex: number, key: StatKey, value: number) => {
+    let finalValue = value;
+    if (key === 'level') {
+      finalValue = Math.max(1, Math.min(17, Math.round(value)));
+    }
     setChips(prev => {
       const newChips = [...prev];
-      newChips[chipIndex] = { ...newChips[chipIndex], [key]: value };
+      newChips[chipIndex] = { ...newChips[chipIndex], [key]: finalValue };
       return newChips;
     });
     // Clear warning
@@ -173,10 +180,10 @@ export default function App() {
   const applyReplacement = (index: number) => {
     setChips(prev => {
       const newChips = [...prev];
-      newChips[index] = { ...candidate };
+      newChips[index] = { ...candidate, level: candidateRank };
       return newChips;
     });
-    setCandidate(DEFAULT_CHIP_STATS);
+    setCandidate({ ...DEFAULT_CHIP_STATS });
     
     // Check if candidate had warnings and clear them, or transfer them? 
     // Usually new candidates are fresh, but if legacy was loaded into candidate:
@@ -232,6 +239,9 @@ export default function App() {
     // Process Chips Legacy Conversion
     const newChips = config.chips.map((chip, idx) => {
       const newChip = { ...chip };
+      if (newChip.level === undefined) {
+        newChip.level = config.level || 15;
+      }
       if (newChip['elem_damage']) {
         if (!newChip['dmg_em']) {
           newChip['dmg_em'] = newChip['elem_damage'];
@@ -261,7 +271,9 @@ export default function App() {
     // Default to 'em' if undefined (legacy configs)
     setSelectedDamageType(config.selectedDamageType || 'em');
     setConfigName(config.name);
-    setShipRank(config.level || 15);
+    const newRank = config.level || 15;
+    setShipRank(newRank);
+    localStorage.setItem('dmg_calc_ship_rank', newRank.toString());
     setIsTemporary(config.isTemporary || false);
     
     // Merge new build warnings with preserved candidate warnings
@@ -281,12 +293,13 @@ export default function App() {
 
   const createNewConfig = () => {
     setBaseStats(DEFAULT_BASE_STATS);
-    setChips(Array(5).fill(DEFAULT_CHIP_STATS));
-    setCandidate(DEFAULT_CHIP_STATS);
+    setChips(Array.from({ length: 5 }, () => ({ ...DEFAULT_CHIP_STATS })));
+    setCandidate({ ...DEFAULT_CHIP_STATS });
     setActiveModules({});
     setSelectedDamageType('em');
     setConfigName("");
     setShipRank(15);
+    localStorage.setItem('dmg_calc_ship_rank', '15');
     setIsTemporary(false);
     setWarnings({});
     setIsSidebarOpen(false);
@@ -297,7 +310,7 @@ export default function App() {
     const newChip: SavedChip = {
       id: crypto.randomUUID(),
       level: rank,
-      stats: { ...chip },
+      stats: { ...chip, level: rank },
       timestamp: Date.now()
     };
     const newChips = [...savedChips, newChip];
@@ -307,11 +320,17 @@ export default function App() {
   };
 
   const exportBackup = () => {
-    if (savedConfigs.length === 0) {
+    if (savedConfigs.length === 0 && savedChips.length === 0) {
       showToast(text.noSavedConfigs, '', 'info');
       return;
     }
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedConfigs, null, 2));
+    const backupData = {
+      configs: savedConfigs.map(c => ({ ...c, level: c.level || 15 })),
+      chips: savedChips,
+      shipRank: shipRank,
+      version: 2
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
     const downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href", dataStr);
     downloadAnchorNode.setAttribute("download", "damage_calc_backup.json");
@@ -333,29 +352,51 @@ export default function App() {
         try {
           const content = event.target?.result as string;
           const parsed = JSON.parse(content);
+          
+          let parsedConfigs: any[] = [];
+          let parsedChips: any[] = [];
+
           if (Array.isArray(parsed)) {
+            parsedConfigs = parsed;
+          } else if (parsed && typeof parsed === 'object') {
+            if (Array.isArray(parsed.configs)) parsedConfigs = parsed.configs;
+            if (Array.isArray(parsed.chips)) parsedChips = parsed.chips;
+          } else {
+            throw new Error("Invalid format");
+          }
+
+          if (parsedConfigs.length > 0) {
             setSavedConfigs(prev => {
               const existingMap = new Map(prev.map(c => [c.name, c]));
-              parsed.forEach(c => {
+              parsedConfigs.forEach(c => {
                 if (c.name) existingMap.set(c.name, c);
               });
               const mergedConfigs = Array.from(existingMap.values());
               localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedConfigs));
               return mergedConfigs;
             });
+          }
 
-            // Extract chips from imported configs
-            setSavedChips(prev => {
-              const newChipsToAdd: SavedChip[] = [];
-              parsed.forEach((config: any) => {
+          if (parsed && typeof parsed === 'object' && parsed.shipRank !== undefined) {
+            setShipRank(parsed.shipRank);
+            localStorage.setItem('dmg_calc_ship_rank', parsed.shipRank.toString());
+          }
+
+          setSavedChips(prev => {
+            let newChipsToAdd: SavedChip[] = [];
+            
+            if (parsedChips.length > 0) {
+              newChipsToAdd = [...parsedChips];
+            } else if (parsedConfigs.length > 0 && Array.isArray(parsed)) {
+              // Extract from legacy configs
+              parsedConfigs.forEach((config: any) => {
                 if (config.chips && Array.isArray(config.chips)) {
                   config.chips.forEach((chip: any) => {
-                    // Check if chip is not empty (has any non-zero stat)
                     const isNotEmpty = Object.values(chip).some(val => val !== 0);
                     if (isNotEmpty) {
                       newChipsToAdd.push({
                         id: crypto.randomUUID(),
-                        level: config.level || 15,
+                        level: chip.level || config.level || 15,
                         stats: { ...chip },
                         timestamp: Date.now(),
                         note: `Imported from ${config.name || 'backup'}`
@@ -364,10 +405,12 @@ export default function App() {
                   });
                 }
               });
+            }
 
-              // Filter out exact duplicates
+            if (newChipsToAdd.length > 0) {
               const uniqueNewChips = newChipsToAdd.filter(newChip => {
                 return !prev.some(existingChip => {
+                  if (newChip.id && existingChip.id === newChip.id) return true;
                   const keys = Object.keys(newChip.stats) as (keyof Stats)[];
                   return existingChip.level === newChip.level && keys.every(k => existingChip.stats[k] === newChip.stats[k]);
                 });
@@ -378,13 +421,11 @@ export default function App() {
                 localStorage.setItem('dmg_calc_chips', JSON.stringify(mergedChips));
                 return mergedChips;
               }
-              return prev;
-            });
+            }
+            return prev;
+          });
 
-            showToast(text.importSuccess, '', 'success');
-          } else {
-            throw new Error("Invalid format");
-          }
+          showToast(text.importSuccess, '', 'success');
         } catch (err) {
           showToast(text.importError, '', 'info');
         }
@@ -630,7 +671,11 @@ export default function App() {
                             min="1"
                             max="17"
                             value={shipRank}
-                            onChange={(e) => setShipRank(Math.max(1, Math.min(17, Number(e.target.value))))}
+                            onChange={(e) => {
+                              const newRank = Math.max(1, Math.min(17, Number(e.target.value)));
+                              setShipRank(newRank);
+                              localStorage.setItem('dmg_calc_ship_rank', newRank.toString());
+                            }}
                             className={`w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-sm text-slate-100 focus:border-blue-500 outline-none transition-colors h-8`}
                         />
                     </div>
@@ -697,6 +742,8 @@ export default function App() {
                       value={chips[activeChipTab][key] || 0}
                       onChange={(k, v) => updateChipStat(activeChipTab, k, v)}
                       warning={warnings[`chip_${activeChipTab}_${key}`]}
+                      min={key === 'level' ? 1 : undefined}
+                      max={key === 'level' ? 17 : undefined}
                       // Dim non-selected damage types to improve UX
                       className={
                         (key === 'dmg_em' && selectedDamageType !== 'em') ||
@@ -796,7 +843,7 @@ export default function App() {
            onCandidateChange={updateCandidate}
            onCandidateRankChange={setCandidateRank}
            onApplyReplacement={applyReplacement}
-           onResetCandidate={() => setCandidate(DEFAULT_CHIP_STATS)}
+           onResetCandidate={() => setCandidate({ ...DEFAULT_CHIP_STATS })}
            onSaveToInventory={() => saveChipToInventory(candidate, candidateRank)}
            onClose={() => setIsAnalysisOpen(false)}
          />
@@ -843,11 +890,13 @@ export default function App() {
          savedChips={savedChips}
          savedConfigs={savedConfigs}
          baseStats={baseStats}
+         currentChips={chips}
          activeModules={activeModules}
          selectedDamageType={selectedDamageType}
          shipRank={shipRank}
          isBetaEnabled={isBetaEnabled}
          texts={text}
+         labels={labels}
          onApplyBuild={(newChips) => {
            setChips(newChips);
            showToast(text.autoBuildApplied, text.chipsUpdated, "success");

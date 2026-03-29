@@ -76,7 +76,7 @@ export const ChipInventory: React.FC<ChipInventoryProps> = ({
               </div>
 
               <div className="grid grid-cols-2 gap-x-2 gap-y-1 mb-3 text-sm flex-1">
-                {CHIP_STATS_KEYS.map((key) => {
+                {CHIP_STATS_KEYS.filter(key => key !== 'level').map((key) => {
                   const value = chip.stats[key];
                   if (!value) return null;
                   return (
