@@ -862,6 +862,12 @@ export default function App() {
                         localStorage.setItem('dmg_calc_chips', JSON.stringify(newChips));
                     }}
                     onScanMissing={scanMissingChips}
+                    onLoadAsCandidate={(chip) => {
+                        setCandidate({ ...chip.stats });
+                        setCandidateRank(chip.level);
+                        setActiveMainTab('editor');
+                        showToast((text as any).loadAsCandidate, '', 'info');
+                    }}
                     texts={text as any}
                     labels={labels}
                 />

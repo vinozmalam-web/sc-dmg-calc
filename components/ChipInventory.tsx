@@ -9,6 +9,7 @@ interface ChipInventoryProps {
   onDeleteChip: (id: string) => void;
   onUpdateChip: (id: string, updatedChip: SavedChip) => void;
   onScanMissing?: () => void;
+  onLoadAsCandidate?: (chip: SavedChip) => void;
   texts: typeof UI_TEXT['en'];
   labels: Record<StatKey, string>;
 }
@@ -18,6 +19,7 @@ export const ChipInventory: React.FC<ChipInventoryProps> = ({
   onDeleteChip,
   onUpdateChip,
   onScanMissing,
+  onLoadAsCandidate,
   texts,
   labels,
 }) => {
@@ -63,7 +65,12 @@ export const ChipInventory: React.FC<ChipInventoryProps> = ({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {savedChips.map((chip) => (
-            <div key={chip.id} className="bg-slate-900/80 border border-slate-700 rounded-lg p-3 flex flex-col relative group hover:border-blue-500/50 transition-colors">
+          <div
+            key={chip.id}
+            className="bg-slate-900/80 border border-slate-700 rounded-lg p-3 flex flex-col relative group hover:border-blue-500/50 transition-colors cursor-pointer select-none"
+            onDoubleClick={() => onLoadAsCandidate?.(chip)}
+            title={texts.loadAsCandidateHint}
+          >
               <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-2">
                   <span className="bg-blue-900/50 text-blue-400 text-[11px] font-bold px-2 py-0.5 rounded border border-blue-800/50">

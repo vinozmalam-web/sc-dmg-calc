@@ -245,7 +245,9 @@ export const UI_TEXT = {
     scanMissing: "Scan Builds",
     scanComplete: "Added {count} missing chips to inventory",
     noMissingChipsFound: "No missing chips found",
-    duplicateChip: "Duplicate chip ignored"
+    duplicateChip: "Duplicate chip ignored",
+    loadAsCandidate: "Load as Candidate",
+    loadAsCandidateHint: "Double-click to load as candidate"
   },
   ru: {
     appTitle: "Калькулятор урона чипов Star Conflict",
@@ -330,7 +332,9 @@ export const UI_TEXT = {
     scanMissing: "Сканировать сборки",
     scanComplete: "Добавлено {count} пропущенных чипов в инвентарь",
     noMissingChipsFound: "Пропущенных чипов не найдено",
-    duplicateChip: "Дубликат чипа проигнорирован"
+    duplicateChip: "Дубликат чипа проигнорирован",
+    loadAsCandidate: "Загрузить как кандидат",
+    loadAsCandidateHint: "Двойной клик — загрузить как кандидат"
   }
 };
 
