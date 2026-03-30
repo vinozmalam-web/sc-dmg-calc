@@ -155,13 +155,16 @@ describe('DamageCalculator', () => {
       expect(res1?.general.dps_delta).toBe(140 - 130);
     });
 
-    it('should return empty results if candidate is empty', () => {
+    it('should return empty results if candidate only has level or non-modifier stats set', () => {
       const baseStats: Stats = { damage: 100, fire_rate: 60 };
       const currentChips: Stats[] = [{ damage: 10 }];
-      const candidate: Stats = { damage: 0 }; // effectively empty
+      const candidate1: Stats = { damage: 0 }; 
+      const candidate2: Stats = { level: 15, damage: 0 };
+      const candidate3: Stats = { level: 17, number_of_cannons: 2 };
       
-      const results = DamageCalculator.findBestReplacement(baseStats, currentChips, candidate);
-      expect(results.length).toBe(0);
+      expect(DamageCalculator.findBestReplacement(baseStats, currentChips, candidate1).length).toBe(0);
+      expect(DamageCalculator.findBestReplacement(baseStats, currentChips, candidate2).length).toBe(0);
+      expect(DamageCalculator.findBestReplacement(baseStats, currentChips, candidate3).length).toBe(0);
     });
   });
 });

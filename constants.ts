@@ -15,6 +15,7 @@ export const BASE_STATS_KEYS: StatKey[] = [
 
 // Replaced 'elem_damage' with specific damage types
 export const CHIP_STATS_KEYS: StatKey[] = [
+  "level",
   "damage",
   "dmg_em",
   "dmg_thermal",
@@ -22,7 +23,6 @@ export const CHIP_STATS_KEYS: StatKey[] = [
   "dmg_destroyers",
   "dmg_aliens",
   "dmg_elidium",
-  "level",
   "fire_rate",
   "range",
   "crit_chance",

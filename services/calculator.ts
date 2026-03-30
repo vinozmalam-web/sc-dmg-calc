@@ -196,7 +196,10 @@ export class DamageCalculator {
     const baseline = this.calculate(baseStats, currentChips, activeModules, selectedDamageType, isBetaEnabled);
     const results: ReplacementResult[] = [];
 
-    const isCandidateEmpty = Object.values(candidateChip).every(v => v === 0);
+    const isCandidateEmpty = !Object.entries(candidateChip).some(([key, value]) => {
+        if (key === 'level' || key === 'number_of_cannons') return false;
+        return value !== 0;
+    });
     if (isCandidateEmpty) return [];
 
     for (let i = 0; i < currentChips.length; i++) {
