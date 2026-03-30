@@ -992,6 +992,7 @@ export default function App() {
          selectedDamageType={selectedDamageType}
          shipRank={shipRank}
          isBetaEnabled={isBetaEnabled}
+         forceCrit={forceCrit}
          texts={text}
          labels={labels}
          onApplyBuild={(newChips) => {

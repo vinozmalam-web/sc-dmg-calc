@@ -15,6 +15,7 @@ interface AutoBuilderModalProps {
   selectedDamageType: DamageType;
   shipRank: number;
   isBetaEnabled: boolean;
+  forceCrit: boolean;
   onApplyBuild: (chips: Stats[]) => void;
   texts: typeof UI_TEXT['en'];
   labels: Record<string, string>;
@@ -31,6 +32,7 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
   selectedDamageType,
   shipRank,
   isBetaEnabled,
+  forceCrit,
   onApplyBuild,
   texts,
   labels
@@ -86,7 +88,7 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
         const testChips = [...selectedChips];
         testChips[i] = currentPool[j];
         
-        const result = DamageCalculator.calculate(baseStats, testChips, activeModules, selectedDamageType, isBetaEnabled);
+        const result = DamageCalculator.calculate(baseStats, testChips, activeModules, selectedDamageType, isBetaEnabled, forceCrit);
         const dpm = optimizeFor === 'general' ? result.general.dpm : result.spec_ops.dpm;
 
         if (dpm > bestDpm) {
@@ -162,13 +164,13 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
   };
 
   const currentResult = useMemo(() => {
-    return DamageCalculator.calculate(baseStats, currentChips, activeModules, selectedDamageType, isBetaEnabled);
-  }, [baseStats, currentChips, activeModules, selectedDamageType, isBetaEnabled]);
+    return DamageCalculator.calculate(baseStats, currentChips, activeModules, selectedDamageType, isBetaEnabled, forceCrit);
+  }, [baseStats, currentChips, activeModules, selectedDamageType, isBetaEnabled, forceCrit]);
 
   const previewResult = useMemo(() => {
     if (!previewChips) return null;
-    return DamageCalculator.calculate(baseStats, previewChips, activeModules, selectedDamageType, isBetaEnabled);
-  }, [baseStats, previewChips, activeModules, selectedDamageType, isBetaEnabled]);
+    return DamageCalculator.calculate(baseStats, previewChips, activeModules, selectedDamageType, isBetaEnabled, forceCrit);
+  }, [baseStats, previewChips, activeModules, selectedDamageType, isBetaEnabled, forceCrit]);
 
   if (!isOpen) return null;
 
