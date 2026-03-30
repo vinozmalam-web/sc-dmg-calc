@@ -57,8 +57,12 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
       usedChips.forEach(usedChip => {
         const index = poolCopy.findIndex(c => {
           // Compare stats
-          const keys = Object.keys(usedChip) as (keyof Stats)[];
-          return keys.every(k => c.stats[k] === usedChip[k]);
+          const keys = new Set([...Object.keys(c.stats), ...Object.keys(usedChip)]);
+          for (const key of Array.from(keys)) {
+            if (key === 'level' || key === 'note') continue;
+            if ((c.stats[key] || 0) !== (usedChip[key as keyof Stats] || 0)) return false;
+          }
+          return true;
         });
         if (index !== -1) {
           poolCopy.splice(index, 1);
@@ -71,13 +75,7 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
   }, [savedChips, savedConfigs, shipRank, useOnlyAvailable]);
 
   const handleCalculate = () => {
-    // Simple greedy algorithm for now:
-    // Start with empty chips
-    // For each slot (0 to 4), find the best chip from the pool that maximizes the target DPM
-    // Remove that chip from the pool and continue
-    // This is a heuristic, not guaranteed optimal, but good enough for a start.
-    
-    let newChips: Stats[] = Array.from({ length: 5 }, () => ({ ...DEFAULT_CHIP_STATS }));
+    let selectedChips: Stats[] = Array.from({ length: 5 }, () => ({ ...DEFAULT_CHIP_STATS }));
     let currentPool = [...availableChips];
 
     for (let i = 0; i < 5; i++) {
@@ -85,7 +83,7 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
       let bestDpm = -1;
 
       for (let j = 0; j < currentPool.length; j++) {
-        const testChips = [...newChips];
+        const testChips = [...selectedChips];
         testChips[i] = currentPool[j];
         
         const result = DamageCalculator.calculate(baseStats, testChips, activeModules, selectedDamageType, isBetaEnabled);
@@ -98,12 +96,57 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
       }
 
       if (bestChipIndex !== -1) {
-        newChips[i] = currentPool[bestChipIndex];
+        selectedChips[i] = currentPool[bestChipIndex];
         currentPool.splice(bestChipIndex, 1);
       }
     }
 
-    setPreviewChips(newChips);
+    // Reorder selected chips to keep existing chips in their original slots
+    const finalChips: Stats[] = Array.from({ length: 5 }, () => ({ ...DEFAULT_CHIP_STATS }));
+    const finalChipsFilled = new Array(5).fill(false);
+    const usedSelectedIndices = new Set<number>();
+
+    for (let i = 0; i < 5; i++) {
+      const currentChip = currentChips[i];
+      const isCurrentEmpty = !Object.entries(currentChip).some(([k, v]) => k !== 'level' && k !== 'number_of_cannons' && v !== 0);
+      
+      if (!isCurrentEmpty) {
+        const matchIndex = selectedChips.findIndex((sc, idx) => {
+          if (usedSelectedIndices.has(idx)) return false;
+          const isScEmpty = !Object.entries(sc).some(([k, v]) => k !== 'level' && k !== 'number_of_cannons' && v !== 0);
+          if (isScEmpty) return false;
+
+          const allKeys = new Set([...Object.keys(sc), ...Object.keys(currentChip)]) as Set<keyof Stats>;
+          
+          for (const key of Array.from(allKeys)) {
+             if (key === 'level' || (key as string) === 'note') continue;
+             if ((sc[key] || 0) !== (currentChip[key] || 0)) return false;
+          }
+          return true;
+        });
+
+        if (matchIndex !== -1) {
+          finalChips[i] = selectedChips[matchIndex];
+          finalChipsFilled[i] = true;
+          usedSelectedIndices.add(matchIndex);
+        }
+      }
+    }
+
+    let selectedIdx = 0;
+    for (let i = 0; i < 5; i++) {
+      if (!finalChipsFilled[i]) {
+        while (selectedIdx < 5 && usedSelectedIndices.has(selectedIdx)) {
+          selectedIdx++;
+        }
+        if (selectedIdx < 5) {
+          finalChips[i] = selectedChips[selectedIdx];
+          usedSelectedIndices.add(selectedIdx);
+        }
+      }
+    }
+
+    setPreviewChips(finalChips);
   };
 
   const handleApply = () => {

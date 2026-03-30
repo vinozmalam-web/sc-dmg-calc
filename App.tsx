@@ -411,8 +411,12 @@ export default function App() {
               const uniqueNewChips = newChipsToAdd.filter(newChip => {
                 return !prev.some(existingChip => {
                   if (newChip.id && existingChip.id === newChip.id) return true;
-                  const keys = Object.keys(newChip.stats) as (keyof Stats)[];
-                  return existingChip.level === newChip.level && keys.every(k => existingChip.stats[k] === newChip.stats[k]);
+                  const keys = new Set([...Object.keys(existingChip.stats), ...Object.keys(newChip.stats)]);
+                  for (const key of Array.from(keys)) {
+                    if (key === 'level' || key === 'note') continue;
+                    if ((existingChip.stats[key] || 0) !== (newChip.stats[key] || 0)) return false;
+                  }
+                  return true;
                 });
               });
 
