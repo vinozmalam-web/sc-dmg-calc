@@ -247,7 +247,9 @@ export const UI_TEXT = {
     noMissingChipsFound: "No missing chips found",
     duplicateChip: "Duplicate chip ignored",
     loadAsCandidate: "Load as Candidate",
-    loadAsCandidateHint: "Double-click to load as candidate"
+    loadAsCandidateHint: "Double-click to load as candidate",
+    forceCrit: "Hull < 15%",
+    forceCritTooltip: "Hull integrity below 15% — guarantees 100% crit chance"
   },
   ru: {
     appTitle: "Калькулятор урона чипов Star Conflict",
@@ -334,7 +336,9 @@ export const UI_TEXT = {
     noMissingChipsFound: "Пропущенных чипов не найдено",
     duplicateChip: "Дубликат чипа проигнорирован",
     loadAsCandidate: "Загрузить как кандидат",
-    loadAsCandidateHint: "Двойной клик — загрузить как кандидат"
+    loadAsCandidateHint: "Двойной клик — загрузить как кандидат",
+    forceCrit: "Прочн. < 15%",
+    forceCritTooltip: "Прочность корпуса менее 15% — обеспечивает 100% шанс крита"
   }
 };
 

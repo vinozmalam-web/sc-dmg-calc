@@ -49,6 +49,7 @@ export default function App() {
   // Beta State
   const [isBetaEnabled, setIsBetaEnabled] = useState(false);
   const [isBetaPopupOpen, setIsBetaPopupOpen] = useState(false);
+  const [forceCrit, setForceCrit] = useState(false);
 
   // UI State
   const [toast, setToast] = useState<{ message: string; subMessage?: string; type: 'success' | 'info' } | null>(null);
@@ -118,8 +119,8 @@ export default function App() {
 
   // --- Calculations ---
   const result = useMemo(() => {
-    return DamageCalculator.calculate(baseStats, chips, activeModules, selectedDamageType, isBetaEnabled);
-  }, [baseStats, chips, activeModules, selectedDamageType, isBetaEnabled]);
+    return DamageCalculator.calculate(baseStats, chips, activeModules, selectedDamageType, isBetaEnabled, forceCrit);
+  }, [baseStats, chips, activeModules, selectedDamageType, isBetaEnabled, forceCrit]);
 
   // --- Helpers ---
   const text = UI_TEXT[language];
@@ -765,6 +766,25 @@ export default function App() {
                             </div>
                             <span className="text-xs font-medium text-slate-400 group-hover:text-slate-300 transition-colors">
                                 {text.temporaryBuild}
+                            </span>
+                        </label>
+                    </div>
+
+                    {/* Force Crit Toggle (Hull < 15%) */}
+                    <div className="flex flex-col relative justify-end h-full">
+                        <label className="flex items-center gap-2 cursor-pointer group h-8" title={(text as any).forceCritTooltip}>
+                            <div className="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only"
+                                    checked={forceCrit}
+                                    onChange={(e) => setForceCrit(e.target.checked)}
+                                />
+                                <div className={`block w-8 h-5 rounded-full transition-colors ${forceCrit ? 'bg-amber-500' : 'bg-slate-700'}`}></div>
+                                <div className={`dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform ${forceCrit ? 'translate-x-3' : ''}`}></div>
+                            </div>
+                            <span className={`text-xs font-medium transition-colors ${forceCrit ? 'text-amber-400 group-hover:text-amber-300' : 'text-slate-400 group-hover:text-slate-300'}`}>
+                                {(text as any).forceCrit}
                             </span>
                         </label>
                     </div>

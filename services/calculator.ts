@@ -34,7 +34,8 @@ export class DamageCalculator {
     chips: Stats[], 
     activeModules: Record<string, ModuleState> = {},
     selectedDamageType: DamageType = 'em',
-    isBetaEnabled: boolean = false
+    isBetaEnabled: boolean = false,
+    forceCrit: boolean = false
   ): CalculationResult {
     // Helper to extract non-zero Z values for a specific key from all chips AND active modules
     const getZValues = (key: string): number[] => {
@@ -108,6 +109,11 @@ export class DamageCalculator {
         mods[key] = res.modSum;
     });
 
+    // Cap crit chance at 100%
+    if (finalStats.crit_chance !== undefined && finalStats.crit_chance > 100) {
+        finalStats.crit_chance = 100;
+    }
+
     // --- Overheat Calculation ---
     const rofZVals = getZValues('fire_rate');
     const coolZVals = getZValues('overheat');
@@ -151,7 +157,7 @@ export class DamageCalculator {
 
     // --- Stage 5: Final DPS/DPM Calculations ---
     const f_fr = finalStats.fire_rate || 0;
-    const f_cc = finalStats.crit_chance || 0;
+    const f_cc = forceCrit ? 100 : (finalStats.crit_chance || 0);
     const f_cp = finalStats.crit_power || 0;
     const f_oh = finalStats.overheat || 0;
     const f_cd = finalStats.cooldown || 0;
