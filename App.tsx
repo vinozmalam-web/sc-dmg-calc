@@ -865,6 +865,7 @@ export default function App() {
                     candidate={candidate}
                     candidateRank={candidateRank}
                     isBetaEnabled={isBetaEnabled}
+                    forceCrit={forceCrit}
                     texts={text}
                     labels={labels}
                 />
@@ -933,6 +934,7 @@ export default function App() {
            activeModules={activeModules}
            selectedDamageType={selectedDamageType}
            isBetaEnabled={isBetaEnabled}
+           forceCrit={forceCrit}
            labels={labels}
            texts={text}
            tooltips={chipTooltips}

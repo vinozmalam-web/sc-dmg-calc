@@ -13,6 +13,7 @@ interface AnalysisPanelProps {
   activeModules: Record<string, ModuleState>;
   selectedDamageType: DamageType;
   isBetaEnabled: boolean;
+  forceCrit: boolean;
   labels: Record<StatKey, string>;
   texts: typeof UI_TEXT['en'];
   tooltips: Record<StatKey, string>;
@@ -33,6 +34,7 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   activeModules,
   selectedDamageType,
   isBetaEnabled,
+  forceCrit,
   labels,
   texts,
   tooltips,
@@ -46,8 +48,8 @@ export const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
 }) => {
   
   const recommendations = useMemo(() => {
-    return DamageCalculator.findBestReplacement(baseStats, chips, candidate, activeModules, selectedDamageType, isBetaEnabled);
-  }, [baseStats, chips, candidate, activeModules, selectedDamageType, isBetaEnabled]);
+    return DamageCalculator.findBestReplacement(baseStats, chips, candidate, activeModules, selectedDamageType, isBetaEnabled, forceCrit);
+  }, [baseStats, chips, candidate, activeModules, selectedDamageType, isBetaEnabled, forceCrit]);
 
   const sortedRecs = useMemo(() => {
     return [...recommendations].sort((a, b) => b.spec_ops.dpm_delta - a.spec_ops.dpm_delta);

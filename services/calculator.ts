@@ -197,9 +197,10 @@ export class DamageCalculator {
     candidateChip: Stats,
     activeModules: Record<string, ModuleState> = {},
     selectedDamageType: DamageType = 'em',
-    isBetaEnabled: boolean = false
+    isBetaEnabled: boolean = false,
+    forceCrit: boolean = false
   ): ReplacementResult[] {
-    const baseline = this.calculate(baseStats, currentChips, activeModules, selectedDamageType, isBetaEnabled);
+    const baseline = this.calculate(baseStats, currentChips, activeModules, selectedDamageType, isBetaEnabled, forceCrit);
     const results: ReplacementResult[] = [];
 
     const isCandidateEmpty = !Object.entries(candidateChip).some(([key, value]) => {
@@ -212,7 +213,7 @@ export class DamageCalculator {
         const tempChips = [...currentChips];
         tempChips[i] = candidateChip;
 
-        const newRes = this.calculate(baseStats, tempChips, activeModules, selectedDamageType, isBetaEnabled);
+        const newRes = this.calculate(baseStats, tempChips, activeModules, selectedDamageType, isBetaEnabled, forceCrit);
 
         results.push({
             replaced_index: i,

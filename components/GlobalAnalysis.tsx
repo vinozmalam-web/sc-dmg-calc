@@ -9,6 +9,7 @@ interface GlobalAnalysisProps {
   candidate: Stats;
   candidateRank: number;
   isBetaEnabled: boolean;
+  forceCrit: boolean;
   texts: typeof UI_TEXT['en'];
   labels: Record<StatKey, string>;
 }
@@ -18,6 +19,7 @@ export const GlobalAnalysis: React.FC<GlobalAnalysisProps> = ({
   candidate,
   candidateRank,
   isBetaEnabled,
+  forceCrit,
   texts,
   labels
 }) => {
@@ -39,7 +41,8 @@ export const GlobalAnalysis: React.FC<GlobalAnalysisProps> = ({
         candidate,
         config.activeModules || {},
         config.selectedDamageType || 'em',
-        isBetaEnabled
+        isBetaEnabled,
+        forceCrit
       );
 
       const bestRec = [...recs].sort((a, b) => {
@@ -66,7 +69,7 @@ export const GlobalAnalysis: React.FC<GlobalAnalysisProps> = ({
       }
       return 0;
     });
-  }, [savedConfigs, candidate, candidateRank, isBetaEnabled]);
+  }, [savedConfigs, candidate, candidateRank, isBetaEnabled, forceCrit]);
 
   const formatDelta = (val: number) => {
     const rounded = Math.round(val);
