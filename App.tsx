@@ -178,6 +178,8 @@ export default function App() {
   };
 
   const applyReplacement = (index: number) => {
+    saveChipToInventory(candidate, candidateRank, true);
+
     setChips(prev => {
       const newChips = [...prev];
       newChips[index] = { ...candidate, level: candidateRank };
@@ -306,17 +308,80 @@ export default function App() {
     showToast(text.newConfigCreated, '', 'info');
   };
 
-  const saveChipToInventory = (chip: Stats, rank: number) => {
-    const newChip: SavedChip = {
-      id: crypto.randomUUID(),
-      level: rank,
-      stats: { ...chip, level: rank },
-      timestamp: Date.now()
-    };
-    const newChips = [...savedChips, newChip];
-    setSavedChips(newChips);
-    localStorage.setItem('dmg_calc_chips', JSON.stringify(newChips));
-    showToast(text.saveAlert, '', 'success');
+  const saveChipToInventory = (chip: Stats, rank: number, silent: boolean = false) => {
+    setSavedChips(prev => {
+      const isDuplicate = prev.some(existingChip => {
+        const keys = new Set([...Object.keys(existingChip.stats), ...Object.keys(chip)]);
+        for (const key of Array.from(keys)) {
+          if (key === 'level' || key === 'note') continue;
+          if ((existingChip.stats[key as keyof Stats] || 0) !== (chip[key as keyof Stats] || 0)) return false;
+        }
+        return true;
+      });
+
+      if (isDuplicate) {
+        if (!silent) showToast(text.duplicateChip, '', 'info');
+        return prev;
+      }
+
+      const newChip: SavedChip = {
+        id: crypto.randomUUID(),
+        level: rank,
+        stats: { ...chip, level: rank },
+        timestamp: Date.now()
+      };
+      // Keep only the newest 300 chips
+      const newChips = [...prev, newChip].slice(-300);
+      localStorage.setItem('dmg_calc_chips', JSON.stringify(newChips));
+      if (!silent) showToast(text.saveAlert, '', 'success');
+      return newChips;
+    });
+  };
+
+  const scanMissingChips = () => {
+    setSavedChips(prev => {
+      const allChipsToScan: Stats[] = [...chips];
+      savedConfigs.forEach(config => {
+        allChipsToScan.push(...config.chips);
+      });
+
+      let addedCount = 0;
+      let newChipsList = [...prev];
+
+      allChipsToScan.forEach(chip => {
+        // Only consider non-empty chips
+        const isNotEmpty = Object.keys(chip).some(k => k !== 'level' && k !== 'note' && chip[k as keyof Stats] !== 0);
+        if (!isNotEmpty) return;
+
+        const isDuplicate = newChipsList.some(existingChip => {
+          const keys = new Set([...Object.keys(existingChip.stats), ...Object.keys(chip)]);
+          for (const key of Array.from(keys)) {
+            if (key === 'level' || key === 'note') continue;
+            if ((existingChip.stats[key as keyof Stats] || 0) !== (chip[key as keyof Stats] || 0)) return false;
+          }
+          return true;
+        });
+
+        if (!isDuplicate && newChipsList.length < 300) {
+          addedCount++;
+          newChipsList.push({
+            id: crypto.randomUUID(),
+            level: chip.level || 15, // Default safely
+            stats: { ...chip, level: chip.level || 15 },
+            timestamp: Date.now()
+          });
+        }
+      });
+
+      if (addedCount > 0) {
+        localStorage.setItem('dmg_calc_chips', JSON.stringify(newChipsList));
+        showToast((text as any).scanComplete.replace('{count}', addedCount.toString()), '', 'success');
+        return newChipsList;
+      } else {
+        showToast((text as any).noMissingChipsFound, '', 'info');
+        return prev;
+      }
+    });
   };
 
   const exportBackup = () => {
@@ -421,7 +486,8 @@ export default function App() {
               });
 
               if (uniqueNewChips.length > 0) {
-                const mergedChips = [...prev, ...uniqueNewChips];
+                // Ensure we don't exceed the 300 limit when importing either
+                const mergedChips = [...prev, ...uniqueNewChips].slice(-300);
                 localStorage.setItem('dmg_calc_chips', JSON.stringify(mergedChips));
                 return mergedChips;
               }
@@ -795,7 +861,8 @@ export default function App() {
                         setSavedChips(newChips);
                         localStorage.setItem('dmg_calc_chips', JSON.stringify(newChips));
                     }}
-                    texts={text}
+                    onScanMissing={scanMissingChips}
+                    texts={text as any}
                     labels={labels}
                 />
             )}

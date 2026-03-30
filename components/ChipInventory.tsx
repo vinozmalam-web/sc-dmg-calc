@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { SavedChip, StatKey } from '../types';
 import { UI_TEXT, CHIP_STATS_KEYS } from '../constants';
-import { Trash2, Edit2, Check, X, Settings } from 'lucide-react';
+import { Trash2, Edit2, Check, X, Settings, Search } from 'lucide-react';
 import { ChipEditorModal } from './ChipEditorModal';
 
 interface ChipInventoryProps {
   savedChips: SavedChip[];
   onDeleteChip: (id: string) => void;
   onUpdateChip: (id: string, updatedChip: SavedChip) => void;
+  onScanMissing?: () => void;
   texts: typeof UI_TEXT['en'];
   labels: Record<StatKey, string>;
 }
@@ -16,6 +17,7 @@ export const ChipInventory: React.FC<ChipInventoryProps> = ({
   savedChips,
   onDeleteChip,
   onUpdateChip,
+  onScanMissing,
   texts,
   labels,
 }) => {
@@ -40,7 +42,18 @@ export const ChipInventory: React.FC<ChipInventoryProps> = ({
 
   return (
     <div className="bg-slate-800/40 rounded-xl p-2.5 sm:p-3 border border-slate-700/50">
-      <h2 className="text-lg font-bold text-slate-100 mb-4">{texts.chipInventory}</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-bold text-slate-100">{texts.chipInventory}</h2>
+        {onScanMissing && (
+          <button
+            onClick={onScanMissing}
+            className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600/30 hover:text-indigo-300 border border-indigo-500/30 rounded text-xs font-medium transition-colors"
+          >
+            <Search className="w-3.5 h-3.5" />
+            {texts.scanMissing}
+          </button>
+        )}
+      </div>
 
       {savedChips.length === 0 ? (
         <div className="text-center py-12 text-slate-500 bg-slate-900/50 rounded-lg border border-slate-800 border-dashed">

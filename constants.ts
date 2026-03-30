@@ -241,7 +241,11 @@ export const UI_TEXT = {
     chipsUpdated: "Chips have been updated.",
     noChipsSaved: "No chips saved yet.",
     saveChipsHint: "Save chips from the Analysis panel to build your inventory.",
-    previewChanges: "Preview Changes"
+    previewChanges: "Preview Changes",
+    scanMissing: "Scan Builds",
+    scanComplete: "Added {count} missing chips to inventory",
+    noMissingChipsFound: "No missing chips found",
+    duplicateChip: "Duplicate chip ignored"
   },
   ru: {
     appTitle: "Калькулятор урона чипов Star Conflict",
@@ -322,7 +326,11 @@ export const UI_TEXT = {
     chipsUpdated: "Чипы были обновлены.",
     noChipsSaved: "Пока нет сохраненных чипов.",
     saveChipsHint: "Сохраняйте чипы из панели сравнения, чтобы собрать инвентарь.",
-    previewChanges: "Предварительный просмотр"
+    previewChanges: "Предварительный просмотр",
+    scanMissing: "Сканировать сборки",
+    scanComplete: "Добавлено {count} пропущенных чипов в инвентарь",
+    noMissingChipsFound: "Пропущенных чипов не найдено",
+    duplicateChip: "Дубликат чипа проигнорирован"
   }
 };
 
