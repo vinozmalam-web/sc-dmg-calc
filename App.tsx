@@ -919,7 +919,7 @@ export default function App() {
                   >
                     {text.chip} {idx + 1}
                     {chipLinks[idx] !== null && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" title="Linked to inventory" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 inline-block" title="Linked to inventory" />
                     )}
                   </button>
                 ))}

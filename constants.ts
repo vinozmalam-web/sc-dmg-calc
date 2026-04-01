@@ -259,7 +259,17 @@ export const UI_TEXT = {
     linkToInventory: "Link to Inventory",
     chipsInInventory: "chips in inventory",
     noChipsInInventory: "No chips in inventory yet. Create one below.",
-    configSyncedChips: "chips were added to inventory from this config"
+    configSyncedChips: "chips were added to inventory from this config",
+    keepRange: "Don't reduce range",
+    keepRangeHint: "The assembled build must have a range ≥ the current build",
+    minOverheat: "Min. Overheat (sec)",
+    minOverheatHint: "Minimum acceptable overheat time in seconds (0 = disabled). If the result is higher — that's fine.",
+    constraintViolatedRange: "Build violates range constraint (range reduced)",
+    constraintViolatedOverheat: "Build violates overheat constraint (overheat too low)",
+    constraintViolatedNotApplicable: "No valid build found satisfying constraints — constraints will be ignored.",
+    slotUnchanged: "Unchanged",
+    slotChanged: "Changed",
+    chipSlots: "Chip Slots"
   },
   ru: {
     appTitle: "Калькулятор урона чипов Star Conflict",
@@ -358,7 +368,17 @@ export const UI_TEXT = {
     linkToInventory: "Привязать к инвентарю",
     chipsInInventory: "чипов в инвентаре",
     noChipsInInventory: "В инвентаре пока нет чипов. Создайте ниже.",
-    configSyncedChips: "чипов добавлено в инвентарь из этой конфигурации"
+    configSyncedChips: "чипов добавлено в инвентарь из этой конфигурации",
+    keepRange: "Не уменьшать дальность",
+    keepRangeHint: "Итоговая дальность должна быть не меньше текущей",
+    minOverheat: "Мин. перегрев (сек)",
+    minOverheatHint: "Минимально допустимое время перегрева в секундах (0 = отключено). Если результат больше — всё хорошо.",
+    constraintViolatedRange: "Сборка нарушает ограничение дальности (дальность уменьшилась)",
+    constraintViolatedOverheat: "Сборка нарушает ограничение перегрева (перегрев слишком маленький)",
+    constraintViolatedNotApplicable: "Не найдено подходящей сборки — ограничения игнорируются.",
+    slotUnchanged: "Остался прежним",
+    slotChanged: "Изменился",
+    chipSlots: "Слоты чипов"
   }
 };
 
