@@ -96,4 +96,5 @@ export interface SavedConfig {
   selectedDamageType?: DamageType;
   level?: number;
   isTemporary?: boolean;
+  chipLinks?: (string | null)[];
 }

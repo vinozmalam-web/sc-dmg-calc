@@ -9,11 +9,12 @@ import { StatInput } from './components/StatInput';
 import { ResultsPanel } from './components/ResultsPanel';
 import { AnalysisPanel } from './components/AnalysisPanel';
 import { ModulesPanel } from './components/ModulesPanel';
-import { Save, FolderOpen, Trash2, Cpu, BarChart2, RefreshCcw, Globe, Check, Info, X, Plus, Download, Upload, Zap } from 'lucide-react';
+import { Save, FolderOpen, Trash2, Cpu, BarChart2, RefreshCcw, Globe, Check, Info, X, Plus, Download, Upload, Zap, ArrowLeftRight } from 'lucide-react';
 
 import { GlobalAnalysis } from './components/GlobalAnalysis';
 import { ChipInventory } from './components/ChipInventory';
 import { AutoBuilderModal } from './components/AutoBuilderModal';
+import { ChipSlotSwitcherModal } from './components/ChipSlotSwitcherModal';
 import { SavedChip } from './types';
 
 const STORAGE_KEY = 'dmg_calc_configs';
@@ -45,6 +46,10 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const [isAutoBuilderOpen, setIsAutoBuilderOpen] = useState(false);
+  const [changeChipSlotIdx, setChangeChipSlotIdx] = useState<number | null>(null);
+
+  // Chip Links: maps chip slot index (0-4) to a SavedChip id (or null if unlinked)
+  const [chipLinks, setChipLinks] = useState<(string | null)[]>(() => Array(5).fill(null));
   
   // Beta State
   const [isBetaEnabled, setIsBetaEnabled] = useState(false);
@@ -154,6 +159,20 @@ export default function App() {
       newChips[chipIndex] = { ...newChips[chipIndex], [key]: finalValue };
       return newChips;
     });
+    // Propagate edit to linked inventory chip
+    const linkedId = chipLinks[chipIndex];
+    if (linkedId) {
+      setSavedChips(prev => {
+        const updated = prev.map(c => {
+          if (c.id !== linkedId) return c;
+          const newStats = { ...c.stats, [key]: finalValue };
+          const newLevel = key === 'level' ? finalValue : c.level;
+          return { ...c, stats: newStats, level: newLevel };
+        });
+        localStorage.setItem('dmg_calc_chips', JSON.stringify(updated));
+        return updated;
+      });
+    }
     // Clear warning
     if (warnings[`chip_${chipIndex}_${key}`]) {
         const newW = {...warnings};
@@ -216,13 +235,52 @@ export default function App() {
       activeModules,
       selectedDamageType,
       level: shipRank,
-      isTemporary
+      isTemporary,
+      chipLinks
     };
     
     const newConfigs = [...savedConfigs.filter(c => c.name !== configName), newConfig];
     setSavedConfigs(newConfigs);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newConfigs));
     showToast(text.saveAlert, '', 'success');
+  };
+
+  // Helper: add a chip to inventory (no-op if duplicate), returns the SavedChip id
+  const addChipToInventoryGetId = (
+    chip: Record<string, number>,
+    rank: number,
+    currentChips: SavedChip[]
+  ): { id: string; chips: SavedChip[] } => {
+    const isDuplicate = currentChips.some(existingChip => {
+      const keys = new Set([...Object.keys(existingChip.stats), ...Object.keys(chip)]);
+      for (const key of Array.from(keys)) {
+        if (key === 'level' || key === 'note') continue;
+        if ((existingChip.stats[key as keyof typeof existingChip.stats] || 0) !== (chip[key] || 0)) return false;
+      }
+      return true;
+    });
+
+    if (isDuplicate) {
+      // Return the existing chip's id
+      const existing = currentChips.find(existingChip => {
+        const keys = new Set([...Object.keys(existingChip.stats), ...Object.keys(chip)]);
+        for (const key of Array.from(keys)) {
+          if (key === 'level' || key === 'note') continue;
+          if ((existingChip.stats[key as keyof typeof existingChip.stats] || 0) !== (chip[key] || 0)) return false;
+        }
+        return true;
+      })!;
+      return { id: existing.id, chips: currentChips };
+    }
+
+    const newChip: SavedChip = {
+      id: crypto.randomUUID(),
+      level: rank,
+      stats: { ...chip, level: rank },
+      timestamp: Date.now()
+    };
+    const newList = [...currentChips, newChip].slice(-300);
+    return { id: newChip.id, chips: newList };
   };
 
   const loadConfig = (config: SavedConfig) => {
@@ -253,6 +311,47 @@ export default function App() {
         delete newChip['elem_damage'];
       }
       return newChip;
+    });
+
+    // Sync chips to inventory and build chipLinks
+    setSavedChips(prev => {
+      let current = [...prev];
+      const newLinks: (string | null)[] = Array(5).fill(null);
+      let addedCount = 0;
+
+      newChips.forEach((chip, idx) => {
+        const isNotEmpty = Object.keys(chip).some(k => k !== 'level' && k !== 'note' && (chip[k] || 0) !== 0);
+        if (!isNotEmpty) {
+          // Use saved link from config if present, else null
+          newLinks[idx] = config.chipLinks?.[idx] ?? null;
+          return;
+        }
+        if (current.length >= 300) {
+          newLinks[idx] = config.chipLinks?.[idx] ?? null;
+          return;
+        }
+        const rank = chip.level || config.level || 15;
+        const result = addChipToInventoryGetId(chip, rank, current);
+        if (result.chips.length > current.length) addedCount++;
+        current = result.chips;
+        newLinks[idx] = result.id;
+      });
+
+      if (addedCount > 0 || current.length !== prev.length) {
+        localStorage.setItem('dmg_calc_chips', JSON.stringify(current));
+        if (addedCount > 0) {
+          showToast(`${addedCount} ${(text as any).configSyncedChips}`, '', 'info');
+        }
+      }
+
+      // Apply chipLinks from config if they override (prefer fresh sync)
+      // Use config.chipLinks only where our sync produced null (empty slots)
+      const finalLinks = newLinks.map((lnk, i) =>
+        lnk !== null ? lnk : (config.chipLinks?.[i] ?? null)
+      );
+      setChipLinks(finalLinks);
+
+      return current;
     });
 
     // NOTE: We deliberately DO NOT load the candidate from the config.
@@ -304,6 +403,7 @@ export default function App() {
     setShipRank(15);
     localStorage.setItem('dmg_calc_ship_rank', '15');
     setIsTemporary(false);
+    setChipLinks(Array(5).fill(null));
     setWarnings({});
     setIsSidebarOpen(false);
     showToast(text.newConfigCreated, '', 'info');
@@ -806,20 +906,49 @@ export default function App() {
                  </button>
               </div>
 
-              <div className="flex border-b border-slate-700 mb-3 overflow-x-auto pb-1 scrollbar-none">
+              <div className="flex border-b border-slate-700 mb-3 overflow-x-auto pb-1 scrollbar-none items-end">
                 {[0, 1, 2, 3, 4].map(idx => (
                   <button
                     key={idx}
                     onClick={() => setActiveChipTab(idx)}
-                    className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[11px] font-medium transition-colors border-b-2 whitespace-nowrap ${
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[11px] font-medium transition-colors border-b-2 whitespace-nowrap flex items-center gap-1 ${
                       activeChipTab === idx 
                       ? 'border-blue-500 text-blue-400 bg-slate-800/50' 
                       : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
                     }`}
                   >
                     {text.chip} {idx + 1}
+                    {chipLinks[idx] !== null && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" title="Linked to inventory" />
+                    )}
                   </button>
                 ))}
+              </div>
+
+              {/* Chip link banner + Change Chip button */}
+              <div className="flex items-center gap-2 mb-2">
+                {chipLinks[activeChipTab] !== null ? (
+                  <div className="flex-1 flex items-start gap-1.5 bg-amber-500/8 border border-amber-500/20 rounded-lg px-2.5 py-1.5">
+                    <ArrowLeftRight className="w-3 h-3 text-amber-400 mt-0.5 shrink-0" />
+                    <span className="text-[11px] text-amber-300/80 leading-snug">
+                      {(text as any).chipLinkedBanner}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex items-center gap-1.5 bg-slate-800/50 border border-slate-700/50 rounded-lg px-2.5 py-1.5">
+                    <ArrowLeftRight className="w-3 h-3 text-slate-500 shrink-0" />
+                    <span className="text-[11px] text-slate-500 leading-snug">
+                      {(text as any).chipUnlinked}
+                    </span>
+                  </div>
+                )}
+                <button
+                  onClick={() => setChangeChipSlotIdx(activeChipTab)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/15 border border-amber-500/40 hover:bg-amber-500/25 hover:border-amber-500/60 text-amber-400 hover:text-amber-300 rounded-lg text-xs font-semibold transition-all shrink-0 shadow-sm"
+                >
+                  <ArrowLeftRight className="w-3.5 h-3.5" />
+                  {(text as any).changeChip}
+                </button>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 animate-in fade-in duration-300">
@@ -1002,6 +1131,56 @@ export default function App() {
            showToast(text.autoBuildApplied, text.chipsUpdated, "success");
          }}
        />
+
+       {/* Chip Slot Switcher Modal */}
+       {changeChipSlotIdx !== null && (
+         <ChipSlotSwitcherModal
+           isOpen={true}
+           slotIndex={changeChipSlotIdx}
+           savedChips={savedChips}
+           currentLinkId={chipLinks[changeChipSlotIdx]}
+           onClose={() => setChangeChipSlotIdx(null)}
+           onSelectChip={(chip) => {
+             const idx = changeChipSlotIdx;
+             setChips(prev => {
+               const newChips = [...prev];
+               newChips[idx] = { ...chip.stats };
+               return newChips;
+             });
+             setChipLinks(prev => {
+               const newLinks = [...prev];
+               newLinks[idx] = chip.id;
+               return newLinks;
+             });
+             setChangeChipSlotIdx(null);
+             showToast(`${text.chip} ${idx + 1}: ${(text as any).changeChip}`, chip.note || '', 'success');
+           }}
+           onCreateNewChip={() => {
+             const idx = changeChipSlotIdx;
+             setSavedChips(prev => {
+               const newChip: SavedChip = {
+                 id: crypto.randomUUID(),
+                 level: shipRank,
+                 stats: { ...chips[idx] },
+                 timestamp: Date.now(),
+               };
+               const newList = [...prev, newChip].slice(-300);
+               localStorage.setItem('dmg_calc_chips', JSON.stringify(newList));
+               // Link the slot to this new chip
+               setChipLinks(links => {
+                 const nl = [...links];
+                 nl[idx] = newChip.id;
+                 return nl;
+               });
+               return newList;
+             });
+             setChangeChipSlotIdx(null);
+             showToast((text as any).createNewChip, '', 'success');
+           }}
+           texts={text as any}
+           labels={labels}
+         />
+       )}
 
     </div>
   );

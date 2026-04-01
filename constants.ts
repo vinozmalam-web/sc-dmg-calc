@@ -249,7 +249,17 @@ export const UI_TEXT = {
     loadAsCandidate: "Load as Candidate",
     loadAsCandidateHint: "Double-click to load as candidate",
     forceCrit: "Hull < 15%",
-    forceCritTooltip: "Hull integrity below 15% — guarantees 100% crit chance"
+    forceCritTooltip: "Hull integrity below 15% — guarantees 100% crit chance",
+    changeChip: "Change Chip",
+    createNewChip: "Create New Chip",
+    chipLinkedBanner: "Editing stats updates this chip in your inventory. Use \"Change Chip\" to swap to a different chip.",
+    chipUnlinked: "Not linked to inventory",
+    selectInventoryChip: "Select from Inventory",
+    chipSwitcherTitle: "Change Chip in Slot",
+    linkToInventory: "Link to Inventory",
+    chipsInInventory: "chips in inventory",
+    noChipsInInventory: "No chips in inventory yet. Create one below.",
+    configSyncedChips: "chips were added to inventory from this config"
   },
   ru: {
     appTitle: "Калькулятор урона чипов Star Conflict",
@@ -338,7 +348,17 @@ export const UI_TEXT = {
     loadAsCandidate: "Загрузить как кандидат",
     loadAsCandidateHint: "Двойной клик — загрузить как кандидат",
     forceCrit: "Прочн. < 15%",
-    forceCritTooltip: "Прочность корпуса менее 15% — обеспечивает 100% шанс крита"
+    forceCritTooltip: "Прочность корпуса менее 15% — обеспечивает 100% шанс крита",
+    changeChip: "Сменить чип",
+    createNewChip: "Создать новый чип",
+    chipLinkedBanner: "Редактирование параметров обновляет этот чип в инвентаре. Для смены чипа используйте кнопку \"Сменить чип\".",
+    chipUnlinked: "Не привязан к инвентарю",
+    selectInventoryChip: "Выбрать из инвентаря",
+    chipSwitcherTitle: "Сменить чип в слоте",
+    linkToInventory: "Привязать к инвентарю",
+    chipsInInventory: "чипов в инвентаре",
+    noChipsInInventory: "В инвентаре пока нет чипов. Создайте ниже.",
+    configSyncedChips: "чипов добавлено в инвентарь из этой конфигурации"
   }
 };
 
