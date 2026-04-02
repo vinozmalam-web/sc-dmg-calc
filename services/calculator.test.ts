@@ -140,6 +140,36 @@ describe('DamageCalculator', () => {
       expect(result.final_stats.fire_rate).toBe(240); // 60 * 4 = 240
       expect(result.general.total_dps).toBe(400); // 100 * 240 / 60 = 400
     });
+
+    it('should handle stage 1 elemental damage specific to kinetic damage type', () => {
+      const baseStats: Stats = { damage: 100, fire_rate: 60 };
+      const chips: Stats[] = [{ dmg_kinetic: 20 }, { dmg_em: 30 }];
+
+      const resKinetic = DamageCalculator.calculate(baseStats, chips, {}, 'kinetic');
+      expect(resKinetic.intermediate.d1).toBe(120); // only gets Kinetic
+    });
+
+    it('should cap crit chance at 100%', () => {
+      const baseStats: Stats = { damage: 100, fire_rate: 60, crit_chance: 80 };
+      const chips: Stats[] = [{ crit_chance: 30 }, { crit_chance: 30 }]; // Z = 30 + 30 -> mods
+      // Wait, 80 base + Z values. If Z = 50, mod = 0.5. 80 * 1.5 = 120 -> capped to 100.
+      const result = DamageCalculator.calculate(baseStats, chips);
+      expect(result.final_stats.crit_chance).toBe(100);
+    });
+
+    it('should calculate proper overheat when base overheat is negative', () => {
+      const baseStats: Stats = { damage: 100, fire_rate: 60, overheat: -10 };
+      
+      const chipsPositiveMod: Stats[] = [{ fire_rate: 50 }]; // total mod: +0.5
+      const resPositive = DamageCalculator.calculate(baseStats, chipsPositiveMod);
+      expect(resPositive.final_stats.overheat).toBeCloseTo(-6.667, 3);
+      
+      const chipsNegativeMod: Stats[] = [{ fire_rate: -50 }]; // total mod: Z=-50 -> 1 - (100/(100-50)) = 1 - 2 = -1.0
+      // wait, earlier we checked math of mod: getMod(-50) -> mod = 1 - (100/(100-50)) = 1 - 2 = -1.
+      // -10 * (1 - (-1)) = -20
+      const resNegative = DamageCalculator.calculate(baseStats, chipsNegativeMod);
+      expect(resNegative.final_stats.overheat).toBeCloseTo(-20, 3);
+    });
   });
 
   describe('findBestReplacement', () => {
