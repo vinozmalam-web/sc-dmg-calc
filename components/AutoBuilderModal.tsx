@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Stats, SavedChip, SavedConfig, ModuleState, DamageType, StatKey } from '../types';
 import { UI_TEXT } from '../constants';
 
@@ -41,7 +41,7 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
 }) => {
   const [useOnlyAvailable, setUseOnlyAvailable] = useState(true);
   const [optimizeFor, setOptimizeFor] = useState<'general' | 'spec_ops'>('general');
-  const [keepRange, setKeepRange] = useState(false);
+  const [minRange, setMinRange] = useState(0);
   const [minOverheat, setMinOverheat] = useState(0);
   const [previewChips, setPreviewChips] = useState<Stats[] | null>(null);
   const [constraintWarnings, setConstraintWarnings] = useState<string[]>([]);
@@ -86,7 +86,20 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
     }
 
     return pool.map(c => ({ ...c.stats, level: c.level }));
+    return pool.map(c => ({ ...c.stats, level: c.level }));
   }, [savedChips, savedConfigs, currentChips, shipRank, useOnlyAvailable]);
+
+  const currentResult = useMemo(() => {
+    return DamageCalculator.calculate(baseStats, currentChips, activeModules, selectedDamageType, isBetaEnabled, forceCrit);
+  }, [baseStats, currentChips, activeModules, selectedDamageType, isBetaEnabled, forceCrit]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setMinRange(Math.round((currentResult.final_stats.range || 0) * 10) / 10);
+      setMinOverheat(Math.round((currentResult.final_stats.overheat || 0) * 10) / 10);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const handleCalculate = () => {
     const { chips, constraintWarnings: rawWarnings } = runAutoBuilder({
@@ -98,7 +111,7 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
       isBetaEnabled,
       forceCrit,
       optimizeFor,
-      keepRange,
+      minRange,
       minOverheat,
     });
 
@@ -106,7 +119,7 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
 
     // Translate internal warning keys to display strings
     const displayWarnings = rawWarnings.map(w => {
-      if (w === 'keepRange') {
+      if (w === 'minRange') {
         return (texts as any).constraintViolatedRange + ' — ' + (texts as any).constraintViolatedNotApplicable;
       }
       if (w === 'minOverheat') {
@@ -129,10 +142,6 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
     setConstraintWarnings([]);
     onClose();
   };
-
-  const currentResult = useMemo(() => {
-    return DamageCalculator.calculate(baseStats, currentChips, activeModules, selectedDamageType, isBetaEnabled, forceCrit);
-  }, [baseStats, currentChips, activeModules, selectedDamageType, isBetaEnabled, forceCrit]);
 
   const previewResult = useMemo(() => {
     if (!previewChips) return null;
@@ -159,14 +168,14 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
             <ConfigPanel
               useOnlyAvailable={useOnlyAvailable}
               optimizeFor={optimizeFor}
-              keepRange={keepRange}
+              minRange={minRange}
               minOverheat={minOverheat}
               availableChipsCount={availableChips.length}
               shipRank={shipRank}
               texts={texts}
               onSetUseOnlyAvailable={setUseOnlyAvailable}
               onSetOptimizeFor={setOptimizeFor}
-              onSetKeepRange={setKeepRange}
+              onSetMinRange={setMinRange}
               onSetMinOverheat={setMinOverheat}
             />
           ) : (
@@ -220,21 +229,21 @@ export const AutoBuilderModal: React.FC<AutoBuilderModalProps> = ({
 interface ConfigPanelProps {
   useOnlyAvailable: boolean;
   optimizeFor: 'general' | 'spec_ops';
-  keepRange: boolean;
+  minRange: number;
   minOverheat: number;
   availableChipsCount: number;
   shipRank: number;
   texts: typeof UI_TEXT['en'];
   onSetUseOnlyAvailable: (v: boolean) => void;
   onSetOptimizeFor: (v: 'general' | 'spec_ops') => void;
-  onSetKeepRange: (v: boolean) => void;
+  onSetMinRange: (v: number) => void;
   onSetMinOverheat: (v: number) => void;
 }
 
 const ConfigPanel: React.FC<ConfigPanelProps> = ({
-  useOnlyAvailable, optimizeFor, keepRange, minOverheat,
+  useOnlyAvailable, optimizeFor, minRange, minOverheat,
   availableChipsCount, shipRank, texts,
-  onSetUseOnlyAvailable, onSetOptimizeFor, onSetKeepRange, onSetMinOverheat,
+  onSetUseOnlyAvailable, onSetOptimizeFor, onSetMinRange, onSetMinOverheat,
 }) => (
   <div className="space-y-3">
     {/* Use only available toggle */}
@@ -276,28 +285,29 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({
       </div>
     </div>
 
-    {/* Keep range */}
-    <label className="flex items-center gap-2 cursor-pointer group" title={(texts as any).keepRangeHint}>
-      <div className="relative flex items-center">
-        <input type="checkbox" className="sr-only" checked={keepRange} onChange={e => onSetKeepRange(e.target.checked)} />
-        <div className={`block w-8 h-5 rounded-full transition-colors ${keepRange ? 'bg-teal-500' : 'bg-slate-700'}`} />
-        <div className={`dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform ${keepRange ? 'translate-x-3' : ''}`} />
-      </div>
-      <span className="text-xs font-medium text-slate-300 group-hover:text-white transition-colors">
-        {(texts as any).keepRange}
-      </span>
-    </label>
+    {/* Min range */}
+    <div title={(texts as any).minRangeHint} className="flex items-center justify-between">
+      <label className="text-xs font-medium text-slate-400 mb-0 w-1/2">{(texts as any).minRange}</label>
+      <input
+        type="number"
+        min={0}
+        step={0.1}
+        value={minRange}
+        onChange={e => onSetMinRange(Math.max(0, Number(e.target.value)))}
+        className="w-1/2 bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-sm text-slate-100 focus:border-teal-500 outline-none transition-colors h-8"
+      />
+    </div>
 
     {/* Min overheat */}
-    <div title={(texts as any).minOverheatHint}>
-      <label className="block text-xs font-medium text-slate-400 mb-1">{(texts as any).minOverheat}</label>
+    <div title={(texts as any).minOverheatHint} className="flex items-center justify-between">
+      <label className="text-xs font-medium text-slate-400 mb-0 w-1/2">{(texts as any).minOverheat}</label>
       <input
         type="number"
         min={0}
         step={0.1}
         value={minOverheat}
         onChange={e => onSetMinOverheat(Math.max(0, Number(e.target.value)))}
-        className="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-sm text-slate-100 focus:border-teal-500 outline-none transition-colors h-8"
+        className="w-1/2 bg-slate-800 border border-slate-700 rounded px-2.5 py-1 text-sm text-slate-100 focus:border-teal-500 outline-none transition-colors h-8"
       />
     </div>
 

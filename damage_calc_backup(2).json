@@ -1,0 +1,1616 @@
+{
+  "configs": [
+    {
+      "name": "tornado",
+      "timestamp": 1774982948510,
+      "baseStats": {
+        "damage": 248,
+        "fire_rate": 60,
+        "range": 2900,
+        "crit_chance": 3,
+        "crit_power": 25,
+        "overheat": 12,
+        "cooldown": 2,
+        "elem_damage": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "number_of_cannons": 4
+      },
+      "chips": [
+        {
+          "number_of_cannons": 1,
+          "damage": 0,
+          "fire_rate": 61,
+          "range": 0,
+          "crit_chance": -45.2,
+          "crit_power": 0,
+          "overheat": 56,
+          "cooldown": 0,
+          "elem_damage": 0,
+          "dmg_em": 0,
+          "dmg_thermal": 0,
+          "dmg_kinetic": 0,
+          "dmg_destroyers": 10.6,
+          "dmg_aliens": 0,
+          "dmg_elidium": 0,
+          "level": 16
+        },
+        {
+          "damage": 59,
+          "fire_rate": 22.1,
+          "range": 26.8,
+          "crit_chance": 20.4,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": 0,
+          "elem_damage": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 0,
+          "dmg_elidium": 0,
+          "level": 13
+        },
+        {
+          "damage": 53,
+          "fire_rate": 0,
+          "range": 31.3,
+          "crit_chance": 0,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 0,
+          "dmg_elidium": 0,
+          "dmg_em": 0,
+          "dmg_thermal": 16.5,
+          "level": 16
+        },
+        {
+          "damage": 151,
+          "fire_rate": 29.7,
+          "range": 0,
+          "crit_chance": 0,
+          "crit_power": -31.2,
+          "overheat": 0,
+          "cooldown": -35,
+          "elem_damage": 0,
+          "dmg_em": 0,
+          "dmg_thermal": 68,
+          "dmg_kinetic": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 0,
+          "dmg_elidium": 0,
+          "level": 15
+        },
+        {
+          "damage": 53,
+          "fire_rate": 0,
+          "range": 30.6,
+          "crit_chance": 0,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": 0,
+          "elem_damage": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 0,
+          "dmg_elidium": 0,
+          "level": 16
+        }
+      ],
+      "candidate": {
+        "number_of_cannons": 1,
+        "damage": 0,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "activeModules": {
+        "ammo_flat_reflector": {
+          "enabled": true,
+          "values": {
+            "range": 15
+          }
+        },
+        "system_horizon": {
+          "enabled": true,
+          "values": {
+            "range": 40.1,
+            "damage": -6.5
+          }
+        },
+        "ammo_thermal_xenon_lamp_mk4": {
+          "enabled": false,
+          "values": {
+            "damage": 7.4
+          }
+        },
+        "ammo_thermal_hf_oscillator_premium": {
+          "enabled": false,
+          "values": {
+            "overheat": 25.9
+          }
+        },
+        "ammo_thermal_flat_reflector": {
+          "enabled": true,
+          "values": {
+            "range": 15
+          }
+        },
+        "implant_2_2": {
+          "enabled": true,
+          "values": {
+            "range": 20
+          }
+        },
+        "implant_6_1": {
+          "enabled": true,
+          "values": {
+            "damage": 7
+          }
+        },
+        "implant_11_2": {
+          "enabled": true,
+          "values": {
+            "fire_rate": 8
+          }
+        },
+        "implant_12_1": {
+          "enabled": true,
+          "values": {
+            "damage": 7
+          }
+        },
+        "implant_13_3": {
+          "enabled": true,
+          "values": {
+            "damage": 15
+          }
+        },
+        "implant_15_1": {
+          "enabled": true,
+          "values": {
+            "damage": 3
+          }
+        }
+      },
+      "selectedDamageType": "thermal",
+      "level": 16,
+      "isTemporary": false
+    },
+    {
+      "name": "mole",
+      "timestamp": 1774983241141,
+      "baseStats": {
+        "damage": 2743,
+        "fire_rate": 60,
+        "range": 3200,
+        "crit_chance": 4,
+        "crit_power": 100,
+        "overheat": 15,
+        "cooldown": 2.9,
+        "elem_damage": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0
+      },
+      "chips": [
+        {
+          "damage": 57,
+          "fire_rate": 0,
+          "range": 16.7,
+          "crit_chance": 0,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": 0,
+          "elem_damage": 0,
+          "dmg_em": 0,
+          "dmg_thermal": 0,
+          "dmg_kinetic": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 0,
+          "dmg_elidium": 0,
+          "level": 15
+        },
+        {
+          "number_of_cannons": 1,
+          "damage": 18.9,
+          "fire_rate": 0,
+          "range": 0,
+          "crit_chance": 0,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": -60,
+          "elem_damage": 0,
+          "dmg_em": 0,
+          "dmg_thermal": 41.5,
+          "dmg_kinetic": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 0,
+          "dmg_elidium": -67,
+          "level": 13
+        },
+        {
+          "damage": 0,
+          "fire_rate": 17.4,
+          "range": 26.7,
+          "crit_chance": 0,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": 0,
+          "elem_damage": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 0,
+          "dmg_elidium": 32.9,
+          "level": 15
+        },
+        {
+          "damage": 48.4,
+          "fire_rate": 0,
+          "range": 0,
+          "crit_chance": 0,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": -49.3,
+          "elem_damage": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 0,
+          "dmg_elidium": 23.4,
+          "level": 15
+        },
+        {
+          "damage": 65,
+          "fire_rate": 0,
+          "range": 26.8,
+          "crit_chance": 0,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 111,
+          "dmg_elidium": 0,
+          "dmg_em": 0,
+          "dmg_thermal": 0,
+          "level": 16
+        }
+      ],
+      "candidate": {
+        "number_of_cannons": 1,
+        "damage": 0,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "activeModules": {
+        "system_horizon": {
+          "enabled": true,
+          "values": {
+            "range": 40.1,
+            "damage": -6.5
+          }
+        },
+        "ammo_thermal_hf_oscillator_premium": {
+          "enabled": false,
+          "values": {
+            "overheat": 25.9
+          }
+        },
+        "ammo_thermal_flat_reflector": {
+          "enabled": true,
+          "values": {
+            "range": 15
+          }
+        }
+      },
+      "selectedDamageType": "thermal",
+      "level": 16,
+      "isTemporary": false
+    },
+    {
+      "name": "Cargolian4",
+      "timestamp": 1774984543066,
+      "baseStats": {
+        "damage": 675,
+        "fire_rate": 50,
+        "range": 5000,
+        "crit_chance": 15,
+        "crit_power": 75,
+        "overheat": 4,
+        "cooldown": 3,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "number_of_cannons": 6
+      },
+      "chips": [
+        {
+          "number_of_cannons": 1,
+          "damage": -12.2,
+          "fire_rate": 112,
+          "range": 0,
+          "crit_chance": 13.9,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": 0,
+          "elem_damage": 0,
+          "dmg_em": 0,
+          "dmg_thermal": 0,
+          "dmg_kinetic": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 97,
+          "dmg_elidium": 0,
+          "level": 15
+        },
+        {
+          "damage": 230,
+          "fire_rate": 0,
+          "range": 0,
+          "crit_chance": -17.9,
+          "crit_power": 0,
+          "overheat": 32.4,
+          "cooldown": 0,
+          "elem_damage": 0,
+          "dmg_em": 0,
+          "dmg_thermal": 0,
+          "dmg_kinetic": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 146,
+          "dmg_elidium": 0,
+          "level": 15
+        },
+        {
+          "damage": 242,
+          "fire_rate": 0,
+          "range": 0,
+          "crit_chance": -13.8,
+          "crit_power": 0,
+          "overheat": 43.5,
+          "cooldown": 0,
+          "elem_damage": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 86,
+          "dmg_elidium": 0,
+          "level": 15
+        },
+        {
+          "number_of_cannons": 1,
+          "damage": -43.8,
+          "fire_rate": 0,
+          "range": 0,
+          "crit_chance": 0,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": 0,
+          "elem_damage": 0,
+          "dmg_em": 33.3,
+          "dmg_thermal": 0,
+          "dmg_kinetic": 0,
+          "dmg_destroyers": 93,
+          "dmg_aliens": 0,
+          "dmg_elidium": 42,
+          "level": 16
+        },
+        {
+          "number_of_cannons": 1,
+          "damage": 142,
+          "fire_rate": 0,
+          "range": 0,
+          "crit_chance": 0,
+          "crit_power": 0,
+          "overheat": 44.8,
+          "cooldown": 0,
+          "elem_damage": 0,
+          "dmg_em": 0,
+          "dmg_thermal": 0,
+          "dmg_kinetic": 50,
+          "dmg_destroyers": 29,
+          "dmg_aliens": 0,
+          "dmg_elidium": 0,
+          "level": 15
+        }
+      ],
+      "candidate": {
+        "number_of_cannons": 1,
+        "damage": 0,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "activeModules": {
+        "implant_2_2": {
+          "enabled": true,
+          "values": {
+            "range": 20
+          }
+        },
+        "implant_6_1": {
+          "enabled": true,
+          "values": {
+            "damage": 7
+          }
+        },
+        "implant_11_2": {
+          "enabled": true,
+          "values": {
+            "fire_rate": 8
+          }
+        },
+        "implant_12_1": {
+          "enabled": true,
+          "values": {
+            "damage": 7
+          }
+        },
+        "implant_13_3": {
+          "enabled": true,
+          "values": {
+            "damage": 15
+          }
+        },
+        "implant_15_1": {
+          "enabled": true,
+          "values": {
+            "damage": 3
+          }
+        },
+        "system_horizon": {
+          "enabled": true,
+          "values": {
+            "range": 40.1,
+            "damage": -6.5
+          }
+        },
+        "ammo_kinetic_vanadium_shells": {
+          "enabled": false,
+          "values": {
+            "fire_rate": 14
+          }
+        },
+        "ammo_kinetic_dissonant_charges_mk4": {
+          "enabled": false,
+          "values": {
+            "dmg_aliens": 5000,
+            "damage": 5
+          }
+        },
+        "ammo_kinetic_piercing_charges_mk4": {
+          "enabled": false,
+          "values": {
+            "dmg_destroyers": 30,
+            "damage": 5
+          }
+        },
+        "ammo_kinetic_resonating_slugs_mk4": {
+          "enabled": true,
+          "values": {
+            "dmg_aliens": 100,
+            "damage": 3
+          }
+        },
+        "shared_cooler": {
+          "enabled": true,
+          "values": {
+            "overheat": 38.8
+          }
+        },
+        "iridium_heatsink": {
+          "enabled": true,
+          "values": {
+            "fire_rate": 10.7
+          }
+        },
+        "infrared_scanner": {
+          "enabled": true,
+          "values": {
+            "crit_chance": 10.5
+          }
+        },
+        "target_tracking_coprocessor": {
+          "enabled": false,
+          "values": {
+            "crit_power": 23
+          }
+        }
+      },
+      "selectedDamageType": "kinetic",
+      "level": 17,
+      "isTemporary": false
+    },
+    {
+      "name": "manul2",
+      "timestamp": 1775077838747,
+      "baseStats": {
+        "damage": 660,
+        "fire_rate": 60,
+        "range": 2800,
+        "crit_chance": 5,
+        "crit_power": 75,
+        "overheat": 7,
+        "cooldown": 2,
+        "elem_damage": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "number_of_cannons": 4
+      },
+      "chips": [
+        {
+          "damage": 0,
+          "fire_rate": 34,
+          "range": 0,
+          "crit_chance": 0,
+          "crit_power": 0,
+          "overheat": 61,
+          "cooldown": 0,
+          "elem_damage": 0,
+          "dmg_em": 83,
+          "dmg_thermal": 0,
+          "dmg_kinetic": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 109,
+          "dmg_elidium": 0,
+          "level": 17
+        },
+        {
+          "damage": 243,
+          "fire_rate": 0,
+          "range": 35.7,
+          "crit_chance": -15.5,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": -75,
+          "elem_damage": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 0,
+          "dmg_elidium": 0,
+          "level": 17
+        },
+        {
+          "damage": 0,
+          "fire_rate": 16.8,
+          "range": 0,
+          "crit_chance": 0,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": 0,
+          "dmg_destroyers": 64,
+          "dmg_aliens": 0,
+          "dmg_elidium": 0,
+          "dmg_em": 79,
+          "level": 17
+        },
+        {
+          "damage": -15.1,
+          "fire_rate": 97,
+          "range": 0,
+          "crit_chance": 0,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": -29.3,
+          "elem_damage": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 134,
+          "dmg_elidium": 0,
+          "level": 16
+        },
+        {
+          "number_of_cannons": 1,
+          "damage": 225,
+          "fire_rate": 0,
+          "range": 0,
+          "crit_chance": -22.2,
+          "crit_power": 0,
+          "overheat": 0,
+          "cooldown": 0,
+          "elem_damage": 0,
+          "dmg_em": 63,
+          "dmg_thermal": 0,
+          "dmg_kinetic": 0,
+          "dmg_destroyers": 0,
+          "dmg_aliens": 0,
+          "dmg_elidium": 30.6,
+          "level": 17
+        }
+      ],
+      "candidate": {
+        "number_of_cannons": 1,
+        "damage": 0,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "activeModules": {
+        "system_horizon": {
+          "enabled": true,
+          "values": {
+            "range": 40.1,
+            "damage": -6.5
+          }
+        },
+        "ammo_em_supernova_deflector": {
+          "enabled": false,
+          "values": {
+            "damage": 20
+          }
+        },
+        "ammo_em_resonating_charges_mk4": {
+          "enabled": true,
+          "values": {
+            "dmg_aliens": 100,
+            "damage": 3
+          }
+        },
+        "implant_2_2": {
+          "enabled": true,
+          "values": {
+            "range": 20
+          }
+        },
+        "implant_6_1": {
+          "enabled": true,
+          "values": {
+            "damage": 7
+          }
+        },
+        "implant_11_2": {
+          "enabled": true,
+          "values": {
+            "fire_rate": 8
+          }
+        },
+        "implant_12_1": {
+          "enabled": true,
+          "values": {
+            "damage": 7
+          }
+        },
+        "implant_13_3": {
+          "enabled": true,
+          "values": {
+            "damage": 15
+          }
+        },
+        "implant_15_1": {
+          "enabled": true,
+          "values": {
+            "damage": 3
+          }
+        },
+        "shared_cooler": {
+          "enabled": true,
+          "values": {
+            "overheat": 38.8
+          }
+        },
+        "iridium_heatsink": {
+          "enabled": true,
+          "values": {
+            "fire_rate": 10.7
+          }
+        },
+        "infrared_scanner": {
+          "enabled": false,
+          "values": {
+            "crit_chance": 10.5
+          }
+        },
+        "target_tracking_coprocessor": {
+          "enabled": false,
+          "values": {
+            "crit_power": 23
+          }
+        }
+      },
+      "selectedDamageType": "em",
+      "level": 17,
+      "isTemporary": false,
+      "chipLinks": [
+        "17784931-3874-42ab-8dbf-0ecbfa08f46e",
+        "18c2e55d-b542-4bce-9d81-b22f844b9072",
+        "71cb855d-ea7c-45bf-8e51-0d5705574740",
+        "0991fb2a-8518-490b-8dbb-7374ed4f896d",
+        "d29dea89-6c9d-4bc6-afee-44ceb09c613f"
+      ]
+    }
+  ],
+  "chips": [
+    {
+      "id": "3632a70d-dc8d-4ec6-ae37-9da1158ce0a3",
+      "level": 15,
+      "stats": {
+        "damage": 57,
+        "fire_rate": 0,
+        "range": 16.7,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "a3b9ac99-7caf-4222-906e-e7656a88b5fe",
+      "level": 15,
+      "stats": {
+        "damage": 44.9,
+        "fire_rate": 28.1,
+        "range": 0,
+        "crit_chance": -28.9,
+        "crit_power": 85,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "47e474ca-5fc9-463b-901c-fe8015cb51ec",
+      "level": 15,
+      "stats": {
+        "damage": 0,
+        "fire_rate": 17.4,
+        "range": 26.7,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 32.9,
+        "level": 15
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "0991fb2a-8518-490b-8dbb-7374ed4f896d",
+      "level": 16,
+      "stats": {
+        "damage": -15.1,
+        "fire_rate": 97,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": -29.3,
+        "elem_damage": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 134,
+        "dmg_elidium": 0,
+        "level": 16
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "40f3d601-1527-40a9-87f9-55849b14a5b2",
+      "level": 15,
+      "stats": {
+        "damage": 48,
+        "fire_rate": 0,
+        "range": 30.6,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 107,
+        "dmg_elidium": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 19.5,
+        "level": 15
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "90806c3c-2fb9-452a-b48b-9e5faaff10f3",
+      "level": 15,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 0,
+        "fire_rate": 61,
+        "range": 0,
+        "crit_chance": -45.2,
+        "crit_power": 0,
+        "overheat": 56,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 10.6,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "09ff8a85-6ef2-4122-9f7f-95ea4968d2ed",
+      "level": 13,
+      "stats": {
+        "damage": 59,
+        "fire_rate": 22.1,
+        "range": 26.8,
+        "crit_chance": 20.4,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 13
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "5b153644-fb84-4691-8d2b-e943ab37b642",
+      "level": 15,
+      "stats": {
+        "damage": 53,
+        "fire_rate": 0,
+        "range": 31.3,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 16.5,
+        "level": 15
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "cc8b6db3-bb4f-454c-b697-6e37dad2416d",
+      "level": 15,
+      "stats": {
+        "damage": 151,
+        "fire_rate": 29.7,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": -31.2,
+        "overheat": 0,
+        "cooldown": -35,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 68,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "eb63aff2-4baf-4231-b958-1193f09eaa27",
+      "level": 15,
+      "stats": {
+        "damage": 53,
+        "fire_rate": 21.1,
+        "range": 30.6,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "f8db844c-98bb-4c88-a149-e1a8261853cf",
+      "level": 15,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": -12.2,
+        "fire_rate": 112,
+        "range": 0,
+        "crit_chance": 13.9,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 97,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "54932abf-237a-4fe4-9630-52922806fe86",
+      "level": 15,
+      "stats": {
+        "damage": 230,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": -17.9,
+        "crit_power": 0,
+        "overheat": 32.4,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 146,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "642a5844-d03b-444c-afec-6c8fa7cd3ce7",
+      "level": 16,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": -43.8,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 33.3,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 93,
+        "dmg_aliens": 0,
+        "dmg_elidium": 42,
+        "level": 16
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "cc308e96-6c4c-48e0-86a7-adbda83a780a",
+      "level": 15,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": -39.4,
+        "fire_rate": 34.1,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 40.8,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 16.1,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 136,
+        "level": 15
+      },
+      "timestamp": 1774903042733
+    },
+    {
+      "id": "7db40fa0-d038-4d91-bbf3-c2e9466088b6",
+      "level": 15,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 142,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 44.8,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 50,
+        "dmg_destroyers": 29,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "timestamp": 1774903042734
+    },
+    {
+      "id": "17784931-3874-42ab-8dbf-0ecbfa08f46e",
+      "level": 17,
+      "stats": {
+        "damage": 0,
+        "fire_rate": 34,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 61,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 83,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 109,
+        "dmg_elidium": 0,
+        "level": 17
+      },
+      "timestamp": 1774903042734
+    },
+    {
+      "id": "18c2e55d-b542-4bce-9d81-b22f844b9072",
+      "level": 17,
+      "stats": {
+        "damage": 243,
+        "fire_rate": 0,
+        "range": 35.7,
+        "crit_chance": -15.5,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": -75,
+        "elem_damage": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 17
+      },
+      "timestamp": 1774903042734,
+      "note": "manul"
+    },
+    {
+      "id": "71cb855d-ea7c-45bf-8e51-0d5705574740",
+      "level": 17,
+      "stats": {
+        "damage": 0,
+        "fire_rate": 16.8,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "dmg_destroyers": 64,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "dmg_em": 79,
+        "level": 17
+      },
+      "timestamp": 1774903042734
+    },
+    {
+      "id": "e510e8c1-676d-4de1-96b6-e383f225c072",
+      "level": 15,
+      "stats": {
+        "damage": 242,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": -13.8,
+        "crit_power": 0,
+        "overheat": 43.5,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 86,
+        "dmg_elidium": 0,
+        "level": 15
+      },
+      "timestamp": 1774903042734
+    },
+    {
+      "id": "ed7a0e34-e703-4905-a59f-6a2286265488",
+      "level": 17,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": -39.1,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 32.4,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 10.4,
+        "dmg_aliens": 194,
+        "dmg_elidium": 0,
+        "level": 17
+      },
+      "timestamp": 1774903241302
+    },
+    {
+      "id": "36a3d7ee-f0df-4d71-b16a-4e9e7db853a4",
+      "level": 17,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 54,
+        "fire_rate": 107,
+        "range": 0,
+        "crit_chance": -38.4,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 65,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 17
+      },
+      "timestamp": 1774905987765
+    },
+    {
+      "id": "445c8933-bf5c-4e3b-bb7c-9acba0c37494",
+      "level": 15,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 36.7,
+        "fire_rate": 28.5,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": -32.5,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 44.2,
+        "dmg_elidium": -65,
+        "level": 15
+      },
+      "timestamp": 1774906072565
+    },
+    {
+      "id": "d0769eed-34ef-405d-acd8-e0e77c3e8fe0",
+      "level": 13,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 18.9,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": -60,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 41.5,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": -67,
+        "level": 13
+      },
+      "timestamp": 1774907192179
+    },
+    {
+      "id": "d29dea89-6c9d-4bc6-afee-44ceb09c613f",
+      "level": 17,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 225,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": -22.2,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 63,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 30.6,
+        "level": 17
+      },
+      "timestamp": 1774908746299
+    },
+    {
+      "id": "33bbe615-5df6-41fd-b883-b9e55984414f",
+      "level": 17,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 139,
+        "fire_rate": 0,
+        "range": 19.8,
+        "crit_chance": 8.3,
+        "crit_power": -33.5,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 79,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 17
+      },
+      "timestamp": 1774908867416
+    },
+    {
+      "id": "07a487c9-fffa-4ede-b4cd-452a0f0740a7",
+      "level": 16,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 0,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": -51,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 42.3,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 120,
+        "dmg_elidium": 0,
+        "level": 16
+      },
+      "timestamp": 1774909005675
+    },
+    {
+      "id": "edce1982-d3e0-403d-bdc3-aa55ab9f6f60",
+      "level": 17,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": -13.8,
+        "fire_rate": 35,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": -60,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 74,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 17
+      },
+      "timestamp": 1774909037244
+    },
+    {
+      "id": "72c204e9-8575-4790-816e-0c645ac6f202",
+      "level": 17,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 130,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": 18,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 80,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 17
+      },
+      "timestamp": 1774909712324
+    },
+    {
+      "id": "56b26794-49b3-4587-8c17-1392aac0f2e9",
+      "level": 17,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 0,
+        "fire_rate": 93,
+        "range": 33.2,
+        "crit_chance": -40,
+        "crit_power": 24,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 17
+      },
+      "timestamp": 1774909761738
+    },
+    {
+      "id": "896d5711-c465-4572-b500-0393763c8b5a",
+      "level": 17,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 222,
+        "fire_rate": -40.7,
+        "range": 35.2,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": -53,
+        "elem_damage": 0,
+        "dmg_em": 51,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 17
+      },
+      "timestamp": 1774909903709
+    },
+    {
+      "id": "35083078-3fea-4a3c-9fd7-811f6c4391e2",
+      "level": 17,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 58,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": -39.5,
+        "crit_power": 43.1,
+        "overheat": 0,
+        "cooldown": -80,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 17
+      },
+      "timestamp": 1774909978387
+    },
+    {
+      "id": "68878531-f2c7-4f10-904b-1d27be08b21b",
+      "level": 16,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 48,
+        "fire_rate": 11.4,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 19.5,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 112,
+        "dmg_elidium": 0,
+        "level": 16
+      },
+      "timestamp": 1774982727172
+    },
+    {
+      "id": "d001c03b-5ad4-4cd6-815a-a4aac7d09d66",
+      "level": 17,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": -14.5,
+        "fire_rate": 97,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 30.7,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 45.3,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 17
+      },
+      "timestamp": 1774985321815
+    },
+    {
+      "id": "46f159f1-5d98-4aa3-9c15-327d9018f039",
+      "level": 16,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 107,
+        "fire_rate": 25.4,
+        "range": 0,
+        "crit_chance": -35.1,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 59,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 16
+      },
+      "timestamp": 1774985370266
+    },
+    {
+      "id": "7556159c-9481-40ca-8122-e6207a9c66be",
+      "level": 17,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 212,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": -19.5,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": -52,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 17
+      },
+      "timestamp": 1774985468693
+    },
+    {
+      "id": "7f68df79-97b8-4e00-90a1-d213e5d83757",
+      "level": 15,
+      "stats": {
+        "damage": 48.4,
+        "fire_rate": 0,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": -49.3,
+        "elem_damage": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 23.4,
+        "level": 15
+      },
+      "timestamp": 1775074700662
+    },
+    {
+      "id": "cdc1e554-8e87-4c07-a505-0c8ec01ce666",
+      "level": 16,
+      "stats": {
+        "damage": 65,
+        "fire_rate": 0,
+        "range": 26.8,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 111,
+        "dmg_elidium": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "level": 16
+      },
+      "timestamp": 1775074700662
+    },
+    {
+      "id": "818162da-7413-4aab-9288-cb3adda4506f",
+      "level": 15,
+      "stats": {
+        "number_of_cannons": 1,
+        "damage": 0,
+        "fire_rate": 20.1,
+        "range": 0,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_em": 0,
+        "dmg_thermal": 0,
+        "dmg_kinetic": 23.3,
+        "dmg_destroyers": 0,
+        "dmg_aliens": -64,
+        "dmg_elidium": 0,
+        "dmg_total": 41.9,
+        "level": 15
+      },
+      "timestamp": 1775144056355
+    },
+    {
+      "id": "7f375ea4-1bee-4788-989c-ec1a06614b35",
+      "level": 16,
+      "stats": {
+        "damage": 53,
+        "fire_rate": 0,
+        "range": 30.6,
+        "crit_chance": 0,
+        "crit_power": 0,
+        "overheat": 0,
+        "cooldown": 0,
+        "elem_damage": 0,
+        "dmg_destroyers": 0,
+        "dmg_aliens": 0,
+        "dmg_elidium": 0,
+        "level": 16
+      },
+      "timestamp": 1775167170994
+    }
+  ],
+  "shipRank": 16,
+  "version": 2
+}
