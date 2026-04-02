@@ -14,6 +14,7 @@ export type StatKey =
   | "dmg_destroyers"
   | "dmg_aliens"
   | "dmg_elidium"
+  | "dmg_total"
   | "number_of_cannons"
   | "level";
 

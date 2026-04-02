@@ -74,7 +74,8 @@ export class DamageCalculator {
         specificDmgZ = getZValues('dmg_kinetic');
     }
     
-    const d1Z = [...genericDmgZ, ...specificDmgZ];
+    const totalDmgNormalZ = isBetaEnabled ? [] : getZValues('dmg_total');
+    const d1Z = [...genericDmgZ, ...specificDmgZ, ...totalDmgNormalZ];
     
     const d1Result = this.calculateFinalValue(baseStats.damage || 0, d1Z);
     const d1 = d1Result.value;
@@ -89,11 +90,15 @@ export class DamageCalculator {
     const d3Result = this.calculateFinalValue(d2, d3Z);
     let d3 = d3Result.value;
 
-    // --- Stage 3.5: Elidium Multiplier (Applies to D3 for Special Ops) ---
-    if (isBetaEnabled) {
-      const elidiumZ = getZValues('dmg_elidium');
-      const elidiumResult = this.calculateFinalValue(d3, elidiumZ);
-      d3 = elidiumResult.value;
+    // --- Stage 3.5: Total Damage (Normal mode: additive to d1; Beta mode: multiplier applied later) ---
+    // In normal mode, dmg_total is simply collected into d1Z (additive with "damage")
+    // In beta mode, we compute the multiplier and save it for application after DPS calculation
+    const totalDmgZ = getZValues('dmg_total');
+    let totalDmgMultiplier = 1.0;
+    if (isBetaEnabled && totalDmgZ.length > 0) {
+      // Compute the multiplier from dmg_total Z-values
+      const totalDmgResult = this.calculateFinalValue(1.0, totalDmgZ);
+      totalDmgMultiplier = totalDmgResult.value;
     }
 
     // --- Stage 4: Final Attributes (Standard Stats) ---
@@ -164,8 +169,9 @@ export class DamageCalculator {
     
     const dpm_denom = (f_oh + f_cd) !== 0 ? (f_oh + f_cd) : 1.0;
 
-    const calculateMode = (baseDmg: number) => {
-      const clean_dps = ((baseDmg * f_fr) / 60.0);
+    const calculateMode = (baseDmg: number, applyTotalMultiplier: boolean) => {
+      const effectiveDmg = applyTotalMultiplier ? baseDmg * totalDmgMultiplier : baseDmg;
+      const clean_dps = ((effectiveDmg * f_fr) / 60.0);
       const crit_dps = clean_dps * (f_cc / 100.0) * (1.0 + (f_cp / 100.0));
       const total_dps = clean_dps + crit_dps;
       const dpm = f_oh > 0 
@@ -180,8 +186,8 @@ export class DamageCalculator {
       };
     };
 
-    const spec_ops = calculateMode(d3);
-    const general = calculateMode(d1);
+    const spec_ops = calculateMode(d3, isBetaEnabled);
+    const general = calculateMode(d1, isBetaEnabled);
 
     return {
       spec_ops,

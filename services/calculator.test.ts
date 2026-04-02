@@ -87,15 +87,29 @@ describe('DamageCalculator', () => {
       expect(result.spec_ops.clean_dps).toBe(198);
     });
 
-    it('should include elidium damage multipliers for spec ops when beta is enabled', () => {
+    it('should include dmg_total additively with base damage in normal mode', () => {
       const baseStats: Stats = { damage: 100, fire_rate: 60 };
-      const chips: Stats[] = [{ dmg_elidium: 100 }]; // +100%
+      const chips: Stats[] = [{ dmg_total: 20 }]; // +20%
 
-      const resDisabled = DamageCalculator.calculate(baseStats, chips, {}, 'em', false);
-      expect(resDisabled.intermediate.d3).toBe(100);
+      // Normal mode: dmg_total is additive with stage 1 damage
+      // Z=20 -> mod=0.2, d1 = 100 * (1 + 0.2) = 120
+      const res = DamageCalculator.calculate(baseStats, chips, {}, 'em', false);
+      expect(res.intermediate.d1).toBe(120);
+      expect(res.general.total_dps).toBe(120);
+    });
 
+    it('should apply dmg_total as a multiplier to final shot damage in beta mode', () => {
+      const baseStats: Stats = { damage: 100, fire_rate: 60 };
+      const chips: Stats[] = [{ dmg_total: 100 }]; // +100%
+
+      // Beta mode: dmg_total is NOT included in d1; it becomes a separate multiplier
+      // totalDmgZ = [100] -> totalDmgResult = calculateFinalValue(1.0, [100]) = 1.0 * (1 + 1.0) = 2.0
+      // d1 stays at 100 (no additive bonus)
+      // effectiveDmg = 100 * 2.0 = 200, DPS = 200
       const resEnabled = DamageCalculator.calculate(baseStats, chips, {}, 'em', true);
-      expect(resEnabled.intermediate.d3).toBe(200); // 100 * 2 = 200
+      expect(resEnabled.intermediate.d1).toBe(100);
+      expect(resEnabled.general.total_dps).toBe(200);
+      expect(resEnabled.spec_ops.total_dps).toBe(200);
     });
 
     it('should apply active modules modifiers with diminishing returns for multiple count', () => {

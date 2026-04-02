@@ -42,7 +42,7 @@ import { SavedChip } from './types';
 import { FolderOpen, RefreshCcw, Check, Info, X } from 'lucide-react';
 
 const LANG_STORAGE_KEY = 'dmg_calc_lang';
-const APP_VERSION = '0.8.1';
+const APP_VERSION = '0.9.11';
 
 export default function App() {
   // --- State ---
@@ -448,11 +448,10 @@ export default function App() {
             <button
               key={tab}
               onClick={() => setActiveMainTab(tab)}
-              className={`px-4 py-2 text-xs font-medium transition-colors border-b-2 whitespace-nowrap ${
-                activeMainTab === tab
+              className={`px-4 py-2 text-xs font-medium transition-colors border-b-2 whitespace-nowrap ${activeMainTab === tab
                   ? 'border-blue-500 text-blue-400 bg-slate-900/50'
                   : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/30'
-              }`}
+                }`}
             >
               {tab === 'editor' ? text.shipEditor : tab === 'global_analysis' ? text.globalAnalysis : text.chipInventory}
             </button>

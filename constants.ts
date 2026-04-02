@@ -23,6 +23,7 @@ export const CHIP_STATS_KEYS: StatKey[] = [
   "dmg_destroyers",
   "dmg_aliens",
   "dmg_elidium",
+  "dmg_total",
   "fire_rate",
   "range",
   "crit_chance",
@@ -48,6 +49,7 @@ export const LABELS: Record<Language, Record<StatKey, string>> = {
     dmg_destroyers: "Dmg vs Destroyers",
     dmg_aliens: "Dmg vs Aliens",
     dmg_elidium: "Dmg vs Elidium",
+    dmg_total: "Total Damage",
     level: "Chip Level"
   },
   ru: {
@@ -66,6 +68,7 @@ export const LABELS: Record<Language, Record<StatKey, string>> = {
     dmg_destroyers: "Урон эсминцам",
     dmg_aliens: "Урон пришельцам",
     dmg_elidium: "Урон Элидиуму",
+    dmg_total: "Общий урон",
     level: "Уровень чипа"
   }
 };
@@ -87,6 +90,7 @@ export const BASE_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     dmg_destroyers: "",
     dmg_aliens: "",
     dmg_elidium: "",
+    dmg_total: "",
     level: ""
   },
   ru: {
@@ -105,6 +109,7 @@ export const BASE_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     dmg_destroyers: "",
     dmg_aliens: "",
     dmg_elidium: "",
+    dmg_total: "",
     level: ""
   }
 };
@@ -126,6 +131,7 @@ export const CHIP_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     dmg_destroyers: "Percentage damage bonus against Destroyer class ships.",
     dmg_aliens: "Percentage damage bonus against Alien faction ships.",
     dmg_elidium: "Percentage damage bonus against Elidium faction ships/structures.",
+    dmg_total: "Normal mode: additive bonus to base damage. Beta mode: multiplier applied to final shot damage after all calculations.",
     level: "The rank/level of the chip (1-17)."
   },
   ru: {
@@ -144,6 +150,7 @@ export const CHIP_TOOLTIPS: Record<Language, Record<StatKey, string>> = {
     dmg_destroyers: "Бонус к урону (%) по кораблям класса Эсминец.",
     dmg_aliens: "Бонус к урону (%) по кораблям фракции Чужих.",
     dmg_elidium: "Бонус к урону (%) по кораблям фракции Элидиум.",
+    dmg_total: "Обычный режим: суммируется с базовым уроном. Бета-режим: мультипликатор, применяемый к итоговому урону за выстрел после всех вычислений.",
     level: "Уровень чипа (1-17)."
   }
 };
@@ -214,7 +221,7 @@ export const UI_TEXT = {
     betaVersion: "Beta Version",
     betaPopupTitle: "Enable Beta Features?",
     betaPopupDesc: "Enabling beta version will activate experimental features. These features might change or be removed in the future. Current beta features:",
-    betaPopupFeature1: "- Dmg vs Elidium chip parameter affects Special Ops damage",
+    betaPopupFeature1: "- Total Damage chip parameter acts as a final multiplier applied after all damage calculations",
     ok: "OK",
     no: "No",
     shipRank: "Ship Rank",
@@ -323,7 +330,7 @@ export const UI_TEXT = {
     betaVersion: "Бета-версия",
     betaPopupTitle: "Включить бета-функции?",
     betaPopupDesc: "Включение бета-версии активирует экспериментальные функции. Эти функции могут измениться или быть удалены в будущем. Текущие бета-функции:",
-    betaPopupFeature1: "- Параметр чипа Урон по Элидиуму влияет на урон в Спецоперациях",
+    betaPopupFeature1: "- Параметр чипа Общий урон является итоговым мультипликатором, применяемым после всех вычислений урона",
     ok: "ОК",
     no: "Нет",
     shipRank: "Ранг корабля",
@@ -398,6 +405,7 @@ export const DEFAULT_BASE_STATS: Record<StatKey, number> = {
   dmg_destroyers: 0,
   dmg_aliens: 0,
   dmg_elidium: 0,
+  dmg_total: 0,
   level: 15
 };
 
