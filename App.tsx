@@ -515,6 +515,10 @@ export default function App() {
               forceCrit={forceCrit}
               texts={text}
               labels={labels}
+              onLoadConfig={(config) => {
+                loadConfig(config);
+                setActiveMainTab('editor');
+              }}
             />
           ) : (
             <ChipInventory

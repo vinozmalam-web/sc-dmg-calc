@@ -12,6 +12,7 @@ interface GlobalAnalysisProps {
   forceCrit: boolean;
   texts: typeof UI_TEXT['en'];
   labels: Record<StatKey, string>;
+  onLoadConfig?: (config: SavedConfig) => void;
 }
 
 export const GlobalAnalysis: React.FC<GlobalAnalysisProps> = ({
@@ -21,7 +22,8 @@ export const GlobalAnalysis: React.FC<GlobalAnalysisProps> = ({
   isBetaEnabled,
   forceCrit,
   texts,
-  labels
+  labels,
+  onLoadConfig
 }) => {
   const [prioritizeMode, setPrioritizeMode] = useState<'general' | 'spec_ops'>('general');
 
@@ -141,12 +143,14 @@ export const GlobalAnalysis: React.FC<GlobalAnalysisProps> = ({
             {analysisResults.map((res, idx) => (
               <div 
                 key={idx} 
-                className={`p-3 rounded-lg border ${
+                onDoubleClick={() => onLoadConfig?.(res.config)}
+                title={texts.loadConfigTooltip || "Double-click to load"}
+                className={`p-3 rounded-lg border cursor-pointer hover:brightness-110 transition-all ${
                   res.status === 'improves' 
                     ? 'bg-emerald-900/20 border-emerald-700/50' 
                     : res.status === 'degrades'
                       ? 'bg-orange-900/10 border-orange-900/30'
-                      : 'bg-red-900/10 border-red-900/30 opacity-60'
+                      : 'bg-red-900/10 border-red-900/30 opacity-60 hover:opacity-80'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1.5">
