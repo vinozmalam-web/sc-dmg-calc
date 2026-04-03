@@ -65,14 +65,14 @@ export function runAutoBuilder(opts: AutoBuilderOptions): AutoBuilderResult {
     let penalty = 1.0;
 
     if (minRange > 0) {
-      const range = r.final_stats.range || 0;
+      const range = Math.round((r.final_stats.range || 0) * 10) / 10;
       if (range < minRange - 0.001) {
         valid = false;
         penalty *= Math.pow(Math.max(0.001, range) / minRange, 20); // Sharp penalty for invalid range
       }
     }
     if (minOverheat > 0) {
-      const oh = r.final_stats.overheat || 0;
+      const oh = Math.round((r.final_stats.overheat || 0) * 10) / 10;
       if (oh < minOverheat - 0.001) {
         valid = false;
         penalty *= Math.pow(Math.max(0.001, oh) / minOverheat, 20);
@@ -179,10 +179,10 @@ export function runAutoBuilder(opts: AutoBuilderOptions): AutoBuilderResult {
   const finalChips = bestResult.resultEval.chips;
   const constraintWarnings: string[] = [];
 
-  if (minRange > 0 && (bestResult.resultEval.final_stats.range || 0) < minRange - 0.001) {
+  if (minRange > 0 && (Math.round((bestResult.resultEval.final_stats.range || 0) * 10) / 10) < minRange - 0.001) {
     constraintWarnings.push('minRange');
   }
-  if (minOverheat > 0 && (bestResult.resultEval.final_stats.overheat || 0) < minOverheat - 0.001) {
+  if (minOverheat > 0 && (Math.round((bestResult.resultEval.final_stats.overheat || 0) * 10) / 10) < minOverheat - 0.001) {
     constraintWarnings.push('minOverheat');
   }
 
