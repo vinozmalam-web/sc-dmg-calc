@@ -179,4 +179,35 @@ describe('runAutoBuilder', () => {
     // But testing line 173 is already enough for this task!
   });
 
+  it('should treat internal floating point values as valid if they round exactly to the min constraint', () => {
+    // If baseStats gets calculated as 8004.96, it rounds to 8005.0. 
+    // It should satisfy minRange: 8005 without warnings/penalties.
+    const localBaseStats = { damage: 100, range: 8004.96, overheat: 9.56, fire_rate: 60, number_of_cannons: 1 };
+    const currentChips = [emptyChip, emptyChip, emptyChip, emptyChip, emptyChip];
+    
+    // Provide an alternative that strictly meets constraint but has terrible stats to see if we wrongly fall back
+    const pool: Stats[] = [
+      { damage: -50, range: 10, overheat: 10 } as Stats
+    ];
+    
+    const opts: AutoBuilderOptions = {
+        baseStats: localBaseStats, 
+        currentChips, 
+        pool, 
+        activeModules: {}, 
+        selectedDamageType: 'em', 
+        isBetaEnabled: false, 
+        forceCrit: false, 
+        optimizeFor: 'general', 
+        minRange: 8005, 
+        minOverheat: 9.6
+    };
+    
+    const result = runAutoBuilder(opts);
+    
+    // Should keep empty chips because the base stats naturally satisfy the constraints (due to rounding)
+    expect(result.constraintWarnings.length).toBe(0);
+    expect(result.chips.some(c => c.damage === -50)).toBe(false);
+  });
+
 });
