@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { SavedChip, StatKey } from '../types';
 import { CHIP_STATS_KEYS } from '../constants';
+import { filterChips } from '../utils/chipSearch';
 import { X, Plus, Search, Check, Link } from 'lucide-react';
 
 interface ChipSlotSwitcherModalProps {
@@ -29,16 +30,7 @@ export const ChipSlotSwitcherModal: React.FC<ChipSlotSwitcherModalProps> = ({
   const [search, setSearch] = useState('');
 
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return savedChips;
-    return savedChips.filter(chip => {
-      if (chip.note?.toLowerCase().includes(q)) return true;
-      if (`${texts.rank} ${chip.level}`.toLowerCase().includes(q)) return true;
-      for (const key of CHIP_STATS_KEYS) {
-        if (chip.stats[key] && labels[key].toLowerCase().includes(q)) return true;
-      }
-      return false;
-    });
+    return filterChips(savedChips, search, texts, labels);
   }, [savedChips, search, labels, texts]);
 
   if (!isOpen) return null;
